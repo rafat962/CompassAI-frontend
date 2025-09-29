@@ -1,0 +1,278 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+import React, { useRef, useState } from "react";
+import ControlledOpenSpeedDial from "../../../../../shared/ui/ControlledOpenSpeedDial";
+import { LuSendHorizontal } from "react-icons/lu";
+import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import {
+    AddMessage,
+    ClearMessage,
+    ToggleLoader,
+} from "../../redux/Compass-V1Slice";
+import { useSendMessage } from "../../hooks/useChat";
+import toast from "react-hot-toast";
+import AiResponse from "./AiResponse";
+import { layer } from "../../../../../shared/static/StaticLayersData";
+import Graphic from "@arcgis/core/Graphic";
+
+import Polygon from "@arcgis/core/geometry/Polygon";
+/**
+ * @typedef {Object} MessageInterface
+ * @property {string} role
+ * @property {string} message
+ */
+const messageInterFace = {
+    role: "",
+    message: "",
+};
+
+const MessageBox = () => {
+    const dispatch = useDispatch();
+    const { view } = useSelector((state) => state.CompassV1);
+
+    const { register, handleSubmit, reset } = useForm();
+    // send Message
+    const { isPending, SendMessageMutate } = useSendMessage();
+    const onSuccess = (data) => {
+        const message = data.message;
+
+        if (message.length < 4) {
+            return;
+        }
+        dispatch(
+            AddMessage({
+                role: "user",
+                message,
+            })
+        );
+        reset();
+        SendMessageMutate(
+            { message },
+            {
+                onSuccess: (data) => {
+                    if (data.statu === "success" && data.type === "sql") {
+                        let fatureData = data.data;
+                        let outFeatures = fatureData.data.features;
+                        dispatch(
+                            AddMessage({
+                                role: "ai",
+                                message: <AiResponse data={outFeatures} />,
+                                features: outFeatures,
+                                SQL: data.SQL,
+                                whereClause: data?.whereClause,
+                                selectedFields: data.selectedFields,
+                                data: data,
+                                response: data.response,
+                                type: "sql",
+                            })
+                        );
+                        // ------------------ map logic ------------------
+                        let finalview = view.view;
+                        layer.definitionExpression = data?.whereClause;
+                        dispatch(ToggleLoader());
+                        // finalview.graphics.removeAll();
+                        // الانتظار حتى يتم تطبيق definitionExpression وتحميل البيانات
+                        setTimeout(async () => {
+                            try {
+                                if (!outFeatures || outFeatures.length === 0) {
+                                    return;
+                                }
+                                // مسح الجرافيكس القديمة
+                                finalview.graphics.removeAll();
+                                const allGraphics = [];
+                                let extent = null;
+                                outFeatures.forEach((row) => {
+                                    if (
+                                        row.geometry &&
+                                        row.geometry.rings &&
+                                        row.geometry.rings.length > 0
+                                    ) {
+                                        try {
+                                            const polygon = new Polygon({
+                                                rings: row.geometry.rings,
+                                                spatialReference: {
+                                                    wkid: 32636,
+                                                },
+                                            });
+
+                                            const graphic = new Graphic({
+                                                geometry: polygon,
+                                                symbol: {
+                                                    type: "simple-fill",
+                                                    color: [255, 0, 0, 0.3],
+                                                    outline: {
+                                                        color: [255, 0, 0, 0.8],
+                                                        width: 2,
+                                                    },
+                                                },
+                                                attributes: row.attributes,
+                                                popupTemplate: {
+                                                    title: "Feature Information",
+                                                    content: `
+                                <div>
+                                    <p><strong>OBJECTID:</strong> {OBJECTID}</p>
+                                    <p><strong>Canal:</strong> {canal}</p>
+                                    <p><strong>Zone:</strong> {Zone}</p>
+                                </div>
+                            `,
+                                                },
+                                            });
+
+                                            allGraphics.push(graphic);
+                                            finalview.graphics.add(graphic);
+
+                                            // حساب النطاق التراكمي
+                                            if (
+                                                graphic.geometry &&
+                                                graphic.geometry.extent
+                                            ) {
+                                                if (extent) {
+                                                    extent = extent.union(
+                                                        graphic.geometry.extent
+                                                    );
+                                                } else {
+                                                    extent =
+                                                        graphic.geometry.extent.clone();
+                                                }
+                                            }
+                                        } catch (error) {
+                                            console.error(
+                                                "Error creating graphic for row:",
+                                                row,
+                                                error
+                                            );
+                                        }
+                                    }
+                                });
+
+                                // التكبير إلى النطاق المحسوب
+                                if (extent && allGraphics.length > 0) {
+                                    setTimeout(() => {
+                                        finalview
+                                            .goTo(extent, {
+                                                duration: 1000,
+                                                padding: 50,
+                                            })
+                                            .catch((error) => {
+                                                // بديل: التكبير إلى أول جرافيك
+                                                if (allGraphics[0].geometry) {
+                                                    finalview.goTo(
+                                                        allGraphics[0].geometry
+                                                    );
+                                                }
+                                            });
+                                    }, 100);
+                                }
+                            } catch (error) {
+                                console.error(
+                                    "Error processing features:",
+                                    error
+                                );
+                            }
+                        }, 500);
+                        if (data?.whereClause == "1=1") return;
+                    } else if (
+                        data.statu === "success" &&
+                        data.type === "aggregation"
+                    ) {
+                        console.log("data", data);
+                        console.log(2);
+                        let response = data.response;
+                        console.log(response);
+
+                        dispatch(
+                            AddMessage({
+                                role: "ai",
+                                message: response,
+                                response: response,
+                                type: "aggregation",
+                            })
+                        );
+                    } else {
+                        toast.error(data?.message);
+                    }
+                    dispatch(ToggleLoader());
+                },
+                onError: (err) => {
+                    console.log(err);
+                    dispatch(ToggleLoader());
+                },
+            }
+        );
+    };
+    const SubmitWithEnter = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); // prevent newline
+            handleSubmit(onSuccess)(); // manually trigger submit
+        }
+    };
+    const textareaRef = useRef();
+    const handleInput = () => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = "auto"; // reset
+            textarea.style.height = textarea.scrollHeight + "px"; // expand
+        }
+    };
+    return (
+        <>
+            <div className="bg-gradient-to-r from-transparent via-blue-800 to-transparent h-[1.5px] w-full" />
+            {/* serachBar */}
+            <div className="flex w-full h-full p-1 md:p-4 trans">
+                {/* search body */}
+                <form
+                    onSubmit={handleSubmit(onSuccess)}
+                    onKeyDown={(e) => SubmitWithEnter(e)}
+                    className={`flex flex-col items-center justify-center h-fit w-full 
+                                focus-within:border-blue-800 rounded-2xl md:rounded-4xl bg-neutral-300
+                                dark:bg-neutral-800 
+                                    px-2 md:px-4 py-1 md:py-2 border border-white shadow-sm`}
+                >
+                    {/* input */}
+                    <textarea
+                        {...register("message")}
+                        ref={(e) => {
+                            register("message").ref(e); // give to RHF
+                            textareaRef.current = e; // save in your ref
+                        }}
+                        placeholder="Type your message..."
+                        rows={1}
+                        onInput={handleInput}
+                        className={` w-full trans resize-none bg-transparent focus:outline-none overflow-auto max-h-20 md:max-h-30 row-start-1 px-4 my-1`}
+                    />
+                    {/* actions */}
+                    <div className="flex items-center justify-between w-full py-1 md:py-2 px-2">
+                        {/* Tools */}
+                        <div
+                            className={`w-fit h-fit relative p-2 mr-6 col-span-1`}
+                        >
+                            <ControlledOpenSpeedDial />
+                        </div>
+                        {/* powerd By */}
+                        <a
+                            href="https://raafatkamel.netlify.app/"
+                            target="_blank"
+                            className="flex items-center justify-center space-x-2 group"
+                        >
+                            <p className=" group-hover:text-blue-950 tracking-widest capitalize text-sm font-sec text-gray-700">
+                                Powerd By
+                            </p>
+                            <div className="w-7 h-7 object-cover ">
+                                <img src="/header/R.K logo.png" alt="" />
+                            </div>
+                        </a>
+                        {/* Send */}
+                        <button
+                            className={` shadow-2xl col-span-1 flex items-center justify-center rounded-full dark:bg-blue-900 bg-sec p-2 cursor-pointer group border-1 border-sec hover:border-blue-800 dark:border-blue-800 dark:hover:border-sec trans`}
+                        >
+                            <LuSendHorizontal className=" text-lg group-hover:text-blue-800 dark:group-hover:text-white dark:group-hover:brightness-200  trans" />
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </>
+    );
+};
+
+export default MessageBox;

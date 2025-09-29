@@ -1,0 +1,18 @@
+{
+    "OBJECTID": "الكود",
+    "canal": "الترعة",
+    "overall": "النسبة الإجمالية لأعمال التنفيذ",
+    "boster_number": "رقم البوستر التابع له",
+    "Zone": "الزون",
+    "pivot_number": "رقم البيفوت",
+    "stage": "المرحلة",
+    "grading_company_code": "الشركه المنفذه للتسويات",
+    "soil_investigation_works": "نتيجة الجسة",
+    "exe_per_grading_works": "نسبه التنفيذ اعمال التسويات",
+    "pivot_foundation_company_code": "الشركه المنفذه للقواعد",
+    "exe_per_pivot_foundations": "نسبه التنفيذ قواعد البيفوت",
+    "irrigation_company_code": "الشركه المنفذه لاجهزه الرى",
+    "completion_date": "تاريخ الإنتهاء",
+    "Shape__Area": "المساحة",
+    "Shape__Length": "الطول"
+}
