@@ -1,0 +1,54 @@
+import { useEffect } from "react";
+import { useGetLayerFields } from "./hooks/useChat";
+import ChatBody from "./utils/ChatBody/ChatBody";
+import Header from "./utils/Header/Header";
+import MessageBox from "./utils/MessageBox/MessageBox";
+import { useDispatch, useSelector } from "react-redux";
+import { AddFields } from "./redux/Compass-V3Slice";
+import toast from "react-hot-toast";
+const MangeChat = () => {
+    const { getFields } = useGetLayerFields();
+    const { messages } = useSelector((state) => state.CompassV3);
+    const dispatch = useDispatch();
+    // get layer fields
+    useEffect(() => {
+        const layerUrl =
+            "https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/Parcels_new/FeatureServer/0";
+        if (messages.length > 0) return;
+        getFields(
+            { featureUrl: layerUrl },
+            {
+                onSuccess: (data) => {
+                    console.log("data", data.fields);
+                    console.log("name", data.name);
+                    dispatch(
+                        AddFields({ fields: data.fields, name: data.name })
+                    );
+                },
+            },
+            {
+                onError: (error) => {
+                    toast.error(error?.message || "");
+                },
+            }
+        );
+    }, []);
+    return (
+        <div className="w-full h-full flex flex-col items-between justify-between  rounded-2xl overflow-hidden  border-2 border-blue-500">
+            {/* header */}
+            <div className="w-full  bg-gradient-to-r from-[#0e7490] via-[#3b82f6] to-[#4f46e5] flex flex-col space-y-3 p-2 border-b-2 border-b-blue-800">
+                <Header />
+            </div>
+            {/* Body */}
+            <div className="w-full bg-white h-full  md:h-[78%] overflow-auto">
+                <ChatBody />
+            </div>
+            {/* Message Box */}
+            <div className="w-full bg-white flex flex-col items-center justify-start ">
+                <MessageBox />
+            </div>
+        </div>
+    );
+};
+
+export default MangeChat;

@@ -8,6 +8,7 @@ import ProtectedRouts from "./components/auth/gurd/Protected.Routs";
 import AppLayout from "./shared/ui/AppLayout";
 import CompassAIV1 from "./components/compassAI-v1/compassAI-v1";
 import CompassAIV2 from "./components/CompassAI-V2/CompassAI-V2";
+import CompassAIV3 from "./components/CompassAI-V3/CompassAI-V3";
 const AppContainer = styled.div`
     box-sizing: border-box;
     padding: 0px;
@@ -32,6 +33,7 @@ const routs = createBrowserRouter([
                     },
                     { path: "/CompassAI-V1", element: <CompassAIV1 /> },
                     { path: "/CompassAI-V2", element: <CompassAIV2 /> },
+                    { path: "/CompassAI-V3", element: <CompassAIV3 /> },
                 ],
             },
         ],

@@ -4,7 +4,7 @@ import axiosInstance from "../inceptron/axiosInstance";
 const sendMessageApi = async (data) => {
     try {
         const response = await axiosInstance.post(
-            "/compass-v2/SendQuery",
+            "/compass-v3/SendQuery",
             data
         );
         return response.data;

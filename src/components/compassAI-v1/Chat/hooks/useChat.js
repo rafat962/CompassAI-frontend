@@ -8,7 +8,6 @@ export function useSendMessage() {
     const { mutate: SendMessageMutate, isPending } = useMutation({
         mutationFn: sendMessageApi,
         onError: (error, variables, context) => {
-            console.log("error", error);
             // An error happened!
             toast.error(error?.message || "");
         },

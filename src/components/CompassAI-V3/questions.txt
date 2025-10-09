@@ -1,0 +1,4 @@
+metaData : which fields are string?
+sympology : please show sympology for lot_type
+aggregation : give me the sum of size
+sql: "Select All parcels where type is residential"

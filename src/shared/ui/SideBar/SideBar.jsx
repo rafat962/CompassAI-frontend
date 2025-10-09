@@ -82,6 +82,12 @@ const SideBar = () => {
                     name={t("Compass-V2")}
                     icon={<LuBrain />}
                 />
+                <ListItem
+                    toUrl="/CompassAI-V3"
+                    openNav={openNav}
+                    name={t("Compass-V3")}
+                    icon={<LuBrain />}
+                />
             </ListContainer>
 
             <ListContainer>

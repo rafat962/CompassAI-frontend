@@ -5,15 +5,26 @@ const initialState = {
     messages: [],
     aiLoader: false,
     view: null,
+    fields: [],
+    selectedField: "",
 };
 
-const CompassV1 = createSlice({
-    name: "CompassV1",
+const CompassV3 = createSlice({
+    name: "CompassV3",
     initialState,
     reducers: {
         AddMessage: (state, action) => {
+            console.log("state", state);
             state.messages.push(action.payload);
             state.aiLoader = true;
+        },
+        AddFields: (state, action) => {
+            state.fields = action.payload.fields;
+            state.messages.push({
+                role: "system",
+                message: action.payload.fields,
+                name: action.payload.name,
+            });
         },
         ClearMessage: (state, action) => {
             state.messages = [];
@@ -24,27 +35,35 @@ const CompassV1 = createSlice({
         ToggleView: (state, action) => {
             state.view = action.payload;
         },
+        ToggleSelectField: (state, action) => {
+            state.selectedField = action.payload;
+        },
+        ClearSelectField: (state, action) => {
+            state.selectedField = "";
+        },
     },
 });
 
 export const {
     AddMessage,
+    AddFields,
+    ToggleSelectField,
     ClearMessage,
     ToggleLoader,
+    ClearSelectField,
     getLastAiMessage,
     ToggleView,
-} = CompassV1.actions;
+} = CompassV3.actions;
 
 // تصحيح الدالة لاستقبال state كامل والتوجه إلى slice الصحيح
 export const getLastAiRes = (state) => {
-    // الوصول إلى messages من خلال slice CompassV1
+    // الوصول إلى messages من خلال slice CompassV2
     const aiMessages =
-        state?.CompassV1?.messages?.filter((msg) => msg.role === "ai") || [];
-
+        state?.CompassV3?.messages?.filter((msg) => msg.role === "ai") || [];
     if (aiMessages.length === 0) {
         return null;
     }
     return aiMessages[aiMessages.length - 1];
 };
 
-export default CompassV1.reducer;
+export default CompassV3.reducer;

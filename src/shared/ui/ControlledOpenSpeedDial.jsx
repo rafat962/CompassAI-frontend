@@ -44,7 +44,6 @@ export default function ControlledOpenSpeedDial() {
     let lastResponse = useSelector(getLastAiRes);
 
     const ExportToExcel = () => {
-        console.log(lastResponse);
         setOpen(false);
         if (lastResponse.role === "user") {
             toast.error("الرسالة الأخيرة للمستخدم وليس للذكاء الاصطناعي");
@@ -57,7 +56,6 @@ export default function ControlledOpenSpeedDial() {
         }
 
         try {
-            console.log("lastResponse", lastResponse);
             // تحضير البيانات للتصدير
             const dataToExport = lastResponse.features.map(
                 (item) => item.attributes

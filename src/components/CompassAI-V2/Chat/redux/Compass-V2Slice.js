@@ -19,7 +19,6 @@ const CompassV2 = createSlice({
         },
         AddFields: (state, action) => {
             state.fields = action.payload.fields;
-            console.log("fields in slice", action.payload.name);
             state.messages.push({
                 role: "system",
                 message: action.payload.fields,
@@ -60,7 +59,6 @@ export const getLastAiRes = (state) => {
     // الوصول إلى messages من خلال slice CompassV2
     const aiMessages =
         state?.CompassV2?.messages?.filter((msg) => msg.role === "ai") || [];
-    console.log(aiMessages);
     if (aiMessages.length === 0) {
         return null;
     }

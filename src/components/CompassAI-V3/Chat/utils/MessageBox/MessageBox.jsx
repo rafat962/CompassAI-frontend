@@ -10,18 +10,14 @@ import {
     ClearMessage,
     ClearSelectField,
     ToggleLoader,
-} from "../../redux/Compass-V2Slice";
+} from "../../redux/Compass-V3Slice";
 import { useSendMessage } from "../../hooks/useChat";
 import toast from "react-hot-toast";
 import AiResponse from "./AiResponse";
 import {
-    layer,
-    layerUrl,
-    Strings,
+    Parcels,
+    ParcelsUrl,
 } from "../../../../../shared/static/StaticLayersData";
-import Graphic from "@arcgis/core/Graphic";
-
-import Polygon from "@arcgis/core/geometry/Polygon";
 import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
 /**
  * @typedef {Object} MessageInterface
@@ -35,7 +31,7 @@ const messageInterFace = {
 
 const MessageBox = () => {
     const dispatch = useDispatch();
-    const { view, selectedField } = useSelector((state) => state.CompassV2);
+    const { view, selectedField } = useSelector((state) => state.CompassV3);
     const { register, handleSubmit, reset, getValues } = useForm();
     useEffect(() => {
         const message = getValues("message");
@@ -63,48 +59,28 @@ const MessageBox = () => {
         SendMessageMutate(
             {
                 message,
-                featureUrl: layerUrl,
+                featureUrl: ParcelsUrl,
             },
             {
                 onSuccess: (data) => {
-                    if (data.statu === "success" && data.type === "sql") {
+                    if (data.statu === "success") {
                         let fatureData = data.featureData.data;
                         let outFeatures = fatureData.features;
                         dispatch(
                             AddMessage({
                                 role: "ai",
-                                message: <AiResponse data={outFeatures} />,
-                                features: outFeatures,
-                                SQL: data.SQL,
-                                whereClause: data?.whereClause,
-                                selectedFields: data.selectedFields,
-                                data: data,
-                                response: data.response,
-                                type: "sql",
+                                message: data,
                             })
                         );
                         // ------------------ map logic ------------------
                         let finalview = view.view;
-                        layer.definitionExpression = data.data.whereClause;
+                        Parcels.definitionExpression = data.data.whereClause;
                         dispatch(ToggleLoader());
                         // finalview.graphics.removeAll();
                         if (data?.whereClause == "1=1") return;
                         setTimeout(() => {
                             drawGraphics(outFeatures, finalview);
                         }, 500);
-                    } else if (
-                        data.statu === "success" &&
-                        data.type === "aggregation"
-                    ) {
-                        let response = data.response;
-                        dispatch(
-                            AddMessage({
-                                role: "ai",
-                                message: response,
-                                response: response,
-                                type: "aggregation",
-                            })
-                        );
                     } else {
                         toast.error(data?.message);
                     }

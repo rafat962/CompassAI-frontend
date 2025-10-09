@@ -15,8 +15,6 @@ function useView(
     sketch = false,
     ...layers
 ) {
-    console.log(zoom);
-    console.log(center);
     let map = new Map({
         basemap,
     });

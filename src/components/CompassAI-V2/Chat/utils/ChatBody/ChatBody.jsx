@@ -16,7 +16,6 @@ const ChatBody = () => {
     const { messages, aiLoader } = useSelector((state) => state.CompassV2);
     const dispatch = useDispatch();
     const selectField = (field) => {
-        console.log(field);
         dispatch(ToggleSelectField(field));
     };
     const CopyResponse = (message) => {

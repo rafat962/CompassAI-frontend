@@ -176,11 +176,7 @@ const MessageBox = () => {
                         data.statu === "success" &&
                         data.type === "aggregation"
                     ) {
-                        console.log("data", data);
-                        console.log(2);
                         let response = data.response;
-                        console.log(response);
-
                         dispatch(
                             AddMessage({
                                 role: "ai",
@@ -195,7 +191,6 @@ const MessageBox = () => {
                     dispatch(ToggleLoader());
                 },
                 onError: (err) => {
-                    console.log(err);
                     dispatch(ToggleLoader());
                 },
             }

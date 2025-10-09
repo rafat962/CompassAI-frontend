@@ -11,7 +11,6 @@ function drawGraphics(outFeatures, finalview) {
         finalview.graphics.removeAll();
         const allGraphics = [];
         let extent = null;
-        console.log(3);
         outFeatures.forEach((row) => {
             if (
                 row.geometry &&
@@ -19,8 +18,6 @@ function drawGraphics(outFeatures, finalview) {
                 row.geometry.rings.length > 0
             ) {
                 try {
-                    console.log(4);
-                    console.log(row);
                     const polygon = new Polygon({
                         rings: row.geometry.rings,
                         spatialReference: {
@@ -71,8 +68,6 @@ function drawGraphics(outFeatures, finalview) {
                 }
             }
         });
-        console.log("allGraphics", allGraphics);
-        console.log(extent);
         // التكبير إلى النطاق المحسوب
         if (extent && !extent.isEmpty) {
             setTimeout(() => {
