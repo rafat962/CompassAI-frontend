@@ -17,7 +17,8 @@ import { BiData } from "react-icons/bi";
 import {
     getLastAiResV3,
     getLastAiMessage,
-} from "../../components/compassAI-v3/Chat/redux/Compass-V3Slice";
+} from "../../components/CompassAI-V3/Chat/redux/Compass-V3Slice";
+
 const actions = [
     {
         icon: <BiExport className="text-lg" />,
