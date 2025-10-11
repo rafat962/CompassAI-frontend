@@ -15,9 +15,9 @@ import * as XLSX from "xlsx";
 import { BiSolidFileJson } from "react-icons/bi";
 import { BiData } from "react-icons/bi";
 import {
-    getLastAiRes,
+    getLastAiResV3,
     getLastAiMessage,
-} from "../../components/compassAI-v1/Chat/redux/Compass-V1Slice";
+} from "../../components/compassAI-v3/Chat/redux/Compass-V3Slice";
 const actions = [
     {
         icon: <BiExport className="text-lg" />,
@@ -36,12 +36,12 @@ const actions = [
 export default function ControlledOpenSpeedDial() {
     const dispatch = useDispatch();
 
-    const { messages } = useSelector((state) => state.CompassV1);
+    const { messages } = useSelector((state) => state.CompassV3);
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    let lastResponse = useSelector(getLastAiRes);
+    let lastResponse = useSelector(getLastAiResV3);
 
     const ExportToExcel = () => {
         setOpen(false);

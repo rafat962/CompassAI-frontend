@@ -19,8 +19,6 @@ const MangeChat = () => {
             { featureUrl: layerUrl },
             {
                 onSuccess: (data) => {
-                    console.log("data", data.fields);
-                    console.log("name", data.name);
                     dispatch(
                         AddFields({ fields: data.fields, name: data.name })
                     );

@@ -14,7 +14,6 @@ const CompassV3 = createSlice({
     initialState,
     reducers: {
         AddMessage: (state, action) => {
-            console.log("state", state);
             state.messages.push(action.payload);
             state.aiLoader = true;
         },
@@ -56,7 +55,7 @@ export const {
 } = CompassV3.actions;
 
 // تصحيح الدالة لاستقبال state كامل والتوجه إلى slice الصحيح
-export const getLastAiRes = (state) => {
+export const getLastAiResV3 = (state) => {
     // الوصول إلى messages من خلال slice CompassV2
     const aiMessages =
         state?.CompassV3?.messages?.filter((msg) => msg.role === "ai") || [];

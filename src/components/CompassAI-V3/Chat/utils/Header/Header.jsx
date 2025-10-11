@@ -2,26 +2,27 @@ import React from "react";
 import { LuRefreshCcw } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { ClearMessage } from "../../redux/Compass-V3Slice";
-import { layer, Strings } from "../../../../../shared/static/StaticLayersData";
-import { center, zoom } from "../../../../../shared/static/StaticMapData";
+import { Parcels } from "../../../../../shared/static/StaticLayersData";
+import { graphicsLayer } from "../../helpers/Layer.api";
 const Header = () => {
     const dispatch = useDispatch();
-    const { view } = useSelector((state) => state.CompassV2);
+    const { view } = useSelector((state) => state.CompassV3);
 
     const ClearChat = () => {
         dispatch(ClearMessage());
         view.view.graphics.removeAll();
-        view.view.goTo(
-            {
-                zoom: zoom,
-                center: center,
-            },
-            {
-                duration: 1000,
-                easing: "ease-in-out",
-            }
-        );
-        layer.definitionExpression = "1=1";
+        graphicsLayer.removeAll();
+        // view.view.goTo(
+        //     {
+        //         zoom: zoom,
+        //         center: center,
+        //     },
+        //     {
+        //         duration: 1000,
+        //         easing: "ease-in-out",
+        //     }
+        // );
+        Parcels.definitionExpression = "1=1";
     };
     return (
         <>

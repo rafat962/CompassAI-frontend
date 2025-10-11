@@ -1,4 +1,40 @@
 metaData : which fields are string?
-sympology : please show sympology for lot_type
+sympology : please show sympology for status
+                const datavisualize = {
+                    type: "metvisualizeadata",
+                    message:
+                        "Colored features by Status to highlight available properties.",
+                    renderer: {
+                        type: "unique-value",
+                        field: "status",
+                        uniqueValueInfos: [
+                            {
+                                value: "available",
+                                symbol: {
+                                    type: "simple-marker",
+                                    color: "#95a5a6",
+                                    size: 10,
+                                },
+                            },
+                        ],
+                        defaultSymbol: {
+                            type: "simple-marker",
+                            color: "#cccccc",
+                            size: 10,
+                        },
+                    },
+                };
 aggregation : give me the sum of size
 sql: "Select All parcels where type is residential"
+chartL please show pie chart for lot type
+                let chartData = {
+                    type: "pie",
+                    labels: ["Commercial", "Residential"],
+                    datasets: [
+                        {
+                            label: "Lot Type Count",
+                            data: [1, 12],
+                            backgroundColor: ["#e74c3c", "#2ecc71"],
+                        },
+                    ],
+                };

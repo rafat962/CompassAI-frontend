@@ -1,33 +1,24 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ControlledOpenSpeedDial from "../../../../../shared/ui/ControlledOpenSpeedDial";
 import { LuSendHorizontal } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import {
     AddMessage,
-    ClearMessage,
     ClearSelectField,
     ToggleLoader,
 } from "../../redux/Compass-V3Slice";
 import { useSendMessage } from "../../hooks/useChat";
 import toast from "react-hot-toast";
-import AiResponse from "./AiResponse";
-import {
-    Parcels,
-    ParcelsUrl,
-} from "../../../../../shared/static/StaticLayersData";
+import { ParcelsUrl } from "../../../../../shared/static/StaticLayersData";
 import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
 /**
  * @typedef {Object} MessageInterface
  * @property {string} role
  * @property {string} message
  */
-const messageInterFace = {
-    role: "",
-    message: "",
-};
 
 const MessageBox = () => {
     const dispatch = useDispatch();
@@ -55,7 +46,9 @@ const MessageBox = () => {
             })
         );
         dispatch(ClearSelectField());
-        reset();
+        reset({
+            message: "",
+        });
         SendMessageMutate(
             {
                 message,
@@ -63,24 +56,14 @@ const MessageBox = () => {
             },
             {
                 onSuccess: (data) => {
-                    if (data.statu === "success") {
-                        let fatureData = data.featureData.data;
-                        let outFeatures = fatureData.features;
+                    if (data.status === "success") {
                         dispatch(
                             AddMessage({
                                 role: "ai",
                                 message: data,
                             })
                         );
-                        // ------------------ map logic ------------------
-                        let finalview = view.view;
-                        Parcels.definitionExpression = data.data.whereClause;
                         dispatch(ToggleLoader());
-                        // finalview.graphics.removeAll();
-                        if (data?.whereClause == "1=1") return;
-                        setTimeout(() => {
-                            drawGraphics(outFeatures, finalview);
-                        }, 500);
                     } else {
                         toast.error(data?.message);
                     }
@@ -146,7 +129,7 @@ const MessageBox = () => {
                             target="_blank"
                             className="flex items-center justify-center space-x-2 group"
                         >
-                            <p className=" group-hover:text-blue-950 tracking-widest capitalize text-sm font-sec text-gray-700">
+                            <p className=" group-hover:text-blue-600 trans tracking-widest capitalize text-sm font-sec text-gray-700">
                                 Powerd By
                             </p>
                             <div className="w-7 h-7 object-cover ">
