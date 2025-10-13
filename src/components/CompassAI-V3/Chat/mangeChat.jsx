@@ -6,14 +6,14 @@ import MessageBox from "./utils/MessageBox/MessageBox";
 import { useDispatch, useSelector } from "react-redux";
 import { AddFields } from "./redux/Compass-V3Slice";
 import toast from "react-hot-toast";
+import { ParcelsUrl } from "../../../shared/static/StaticLayersData";
 const MangeChat = () => {
     const { getFields } = useGetLayerFields();
     const { messages } = useSelector((state) => state.CompassV3);
     const dispatch = useDispatch();
     // get layer fields
     useEffect(() => {
-        const layerUrl =
-            "https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/Parcels_new/FeatureServer/0";
+        const layerUrl = ParcelsUrl;
         if (messages.length > 0) return;
         getFields(
             { featureUrl: layerUrl },

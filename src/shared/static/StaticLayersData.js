@@ -24,6 +24,7 @@ const layerPortal = "958bbeb057c44886bde9f1517c3f12ea";
 
 const Parcels = new FeatureLayer({
     portalItem: {
+        // id: "c86b609bd41444a5a42f1d8f96485137", // Your portal item ID
         id: "0e77a171e98c409a929e435b13269b2e", // Your portal item ID
     },
     outFields: ["*"], // Ensure all fields are available
@@ -48,6 +49,8 @@ const Parcels = new FeatureLayer({
     ],
     labelsVisible: true,
 });
+// const ParcelsUrl =
+//     "https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/posters_last_without_domain/FeatureServer/0";
 const ParcelsUrl =
     "https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/Parcels_new/FeatureServer/0";
 // const Parcels = new FeatureLayer({

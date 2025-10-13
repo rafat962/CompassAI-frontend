@@ -68,9 +68,7 @@ const AiResponseSql = ({ data }) => {
 
     if (!data || data.length === 0) {
         return (
-            <div className="text-center text-gray-500">
-                لا توجد بيانات لعرضها
-            </div>
+            <div className="text-center text-gray-500">there is no Data</div>
         );
     }
 

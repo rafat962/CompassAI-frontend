@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import AiResponseSql from "./utils/AiResponseSql";
 import ChartDisplay from "./utils/ChartDisplay";
 import { Parcels } from "../../../../../shared/static/StaticLayersData";
+import ReportResponse from "./utils/ReportResponse";
 
 const AIResponse = ({ data, CopyResponse }) => {
     const [type, setType] = useState();
@@ -54,8 +55,23 @@ const AIResponse = ({ data, CopyResponse }) => {
                 console.log("chart", FinalData?.data);
                 setMessage(<ChartDisplay chartData={FinalData?.data} />);
                 break;
+            case "report":
+                console.log("report", FinalData.data);
+                let sampleData = {};
+                setMessage(<ReportResponse data={FinalData.data} />);
+                break;
             case "metadata":
-                setMessage(FinalData?.message);
+                if (FinalData?.data?.fields?.length) {
+                    const formattedFields = FinalData.data.fields
+                        .map(
+                            (f) =>
+                                `• ${f.name} (${f.alias}) — Type: ${f.type}, Sample: ${f.sampleValue}`
+                        )
+                        .join("\n");
+                    setMessage(`${FinalData?.message}:\n${formattedFields}`);
+                } else {
+                    setMessage(`${FinalData?.message}`);
+                }
                 break;
             case "sql-query":
                 getLayerData(view.view, FinalData?.whereClause).then((data) => {
@@ -104,17 +120,26 @@ const AIResponse = ({ data, CopyResponse }) => {
                         <TextGenerateEffect words={message} />
                     </p>
                 )}
-                {/* copy */}
-                {type !== "sql-query" && type !== "chart" && (
-                    <div
-                        onClick={() => CopyResponse(message)}
-                        className="w-full flex items-center justify-end p-1"
-                    >
-                        <Tooltip title="Copy">
-                            <LuCopy className="text-end cursor-pointer" />
-                        </Tooltip>
-                    </div>
+                {type === "report" && (
+                    <p dir="ltr" className=" text-wrap w-full p-1">
+                        <>
+                            <p className=" text-wrap w-full">{message}</p>
+                        </>
+                    </p>
                 )}
+                {/* copy */}
+                {type !== "sql-query" &&
+                    type !== "chart" &&
+                    type !== "report" && (
+                        <div
+                            onClick={() => CopyResponse(message)}
+                            className="w-full flex items-center justify-end p-1"
+                        >
+                            <Tooltip title="Copy">
+                                <LuCopy className="text-end cursor-pointer" />
+                            </Tooltip>
+                        </div>
+                    )}
             </div>
         </div>
     );
