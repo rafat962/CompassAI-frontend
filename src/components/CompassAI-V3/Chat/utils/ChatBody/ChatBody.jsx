@@ -29,6 +29,7 @@ const ChatBody = () => {
             chatEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages, aiLoader]);
+    console.log("messages", messages);
 
     return (
         <>

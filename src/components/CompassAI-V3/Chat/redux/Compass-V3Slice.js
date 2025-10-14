@@ -7,6 +7,8 @@ const initialState = {
     view: null,
     fields: [],
     selectedField: "",
+    layerUrl: "",
+    FeatureLayer: null,
 };
 
 const CompassV3 = createSlice({
@@ -37,6 +39,12 @@ const CompassV3 = createSlice({
         ToggleSelectField: (state, action) => {
             state.selectedField = action.payload;
         },
+        ToggleLayerUrl: (state, action) => {
+            state.layerUrl = action.payload;
+        },
+        ToggleFeatureLayer: (state, action) => {
+            state.FeatureLayer = action.payload;
+        },
         ClearSelectField: (state, action) => {
             state.selectedField = "";
         },
@@ -52,6 +60,8 @@ export const {
     ClearSelectField,
     getLastAiMessage,
     ToggleView,
+    ToggleLayerUrl,
+    ToggleFeatureLayer,
 } = CompassV3.actions;
 
 // تصحيح الدالة لاستقبال state كامل والتوجه إلى slice الصحيح

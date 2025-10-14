@@ -1,6 +1,7 @@
 import React from "react";
 
 const SystemMessage = ({ item, selectField }) => {
+    if (!item.message) return;
     return (
         <div className="flex w-full flex-col items-center justify-center space-y-4">
             <div className="flex items-center shadow-md ring-2 ring-sky-300 select-none cursor-pointer justify-center rounded-full px-6 py-1 ">
@@ -11,7 +12,7 @@ const SystemMessage = ({ item, selectField }) => {
             </div>
             <div className="flex items-center justify-center space-x-2 flex-wrap">
                 {/* item */}
-                {item.message.map((field) => {
+                {item.message?.map((field) => {
                     return (
                         <div
                             onClick={() => selectField(field.name)}

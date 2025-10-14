@@ -6,15 +6,15 @@ import MessageBox from "./utils/MessageBox/MessageBox";
 import { useDispatch, useSelector } from "react-redux";
 import { AddFields } from "./redux/Compass-V3Slice";
 import toast from "react-hot-toast";
-import { ParcelsUrl } from "../../../shared/static/StaticLayersData";
 const MangeChat = () => {
     const { getFields } = useGetLayerFields();
     const { messages } = useSelector((state) => state.CompassV3);
     const dispatch = useDispatch();
+    const { layerUrl } = useSelector((state) => state.CompassV3);
     // get layer fields
     useEffect(() => {
-        const layerUrl = ParcelsUrl;
         if (messages.length > 0) return;
+        if (!layerUrl) return;
         getFields(
             { featureUrl: layerUrl },
             {
@@ -30,7 +30,7 @@ const MangeChat = () => {
                 },
             }
         );
-    }, []);
+    }, [layerUrl]);
     return (
         <div className="w-full h-full flex flex-col items-between justify-between  rounded-2xl overflow-hidden  border-2 border-blue-500">
             {/* header */}

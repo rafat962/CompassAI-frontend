@@ -22,7 +22,9 @@ import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
 
 const MessageBox = () => {
     const dispatch = useDispatch();
-    const { view, selectedField } = useSelector((state) => state.CompassV3);
+    const { view, selectedField, layerUrl } = useSelector(
+        (state) => state.CompassV3
+    );
     const { register, handleSubmit, reset, getValues } = useForm();
     useEffect(() => {
         const message = getValues("message");
@@ -52,7 +54,7 @@ const MessageBox = () => {
         SendMessageMutate(
             {
                 message,
-                featureUrl: ParcelsUrl,
+                featureUrl: layerUrl,
             },
             {
                 onSuccess: (data) => {

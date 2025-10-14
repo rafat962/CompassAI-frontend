@@ -18,7 +18,7 @@ import ReportResponse from "./utils/ReportResponse";
 const AIResponse = ({ data, CopyResponse }) => {
     const [type, setType] = useState();
     const [message, setMessage] = useState();
-    const { view } = useSelector((state) => state.CompassV3);
+    const { view, FeatureLayer } = useSelector((state) => state.CompassV3);
 
     useEffect(() => {
         if (!data) return;
@@ -32,7 +32,7 @@ const AIResponse = ({ data, CopyResponse }) => {
                 console.log("aggregation");
                 const aggregationData = FinalData?.data;
                 console.log(aggregationData);
-                applyAggregation(aggregationData).then((res) => {
+                applyAggregation(aggregationData, FeatureLayer).then((res) => {
                     console.log("finalRes", res);
                     setMessage(res);
                 });
@@ -74,7 +74,13 @@ const AIResponse = ({ data, CopyResponse }) => {
                 }
                 break;
             case "sql-query":
-                getLayerData(view.view, FinalData?.whereClause).then((data) => {
+                console.log(FinalData);
+                console.log(FinalData?.whereClause);
+                getLayerData(
+                    view.view,
+                    FinalData?.whereClause,
+                    FeatureLayer
+                ).then((data) => {
                     setMessage(<AiResponseSql data={data} />);
                 });
                 break;

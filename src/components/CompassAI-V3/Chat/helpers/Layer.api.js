@@ -1,15 +1,14 @@
 import Graphic from "@arcgis/core/Graphic";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import { Parcels } from "../../../../shared/static/StaticLayersData";
 
 export const graphicsLayer = new GraphicsLayer();
 // --------------------------- Sql ---------------------------
-async function getLayerData(view, whereClause) {
+async function getLayerData(view, whereClause, featureLayer) {
     // حط الـ whereClause
-    Parcels.definitionExpression = whereClause;
+    featureLayer.definitionExpression = whereClause;
 
     // نفّذ الكويري
-    const res = await Parcels.queryFeatures({
+    const res = await featureLayer.queryFeatures({
         where: whereClause,
         outFields: ["*"],
         returnGeometry: true, // مهم عشان نرسم
@@ -148,7 +147,7 @@ function fixRendererForGeometry(renderer, geometryType) {
 
 // --------------------------- Aggregation ---------------------------
 
-async function applyAggregation(aggregationData) {
+async function applyAggregation(aggregationData, featureLayer) {
     try {
         if (
             !aggregationData ||
@@ -159,7 +158,7 @@ async function applyAggregation(aggregationData) {
             return;
         }
 
-        const layer = Parcels;
+        const layer = featureLayer;
         const query = layer.createQuery();
 
         // ✅ استخدم الشرط الصحيح من مخرج الـ AI
