@@ -6,7 +6,7 @@ import { Parcels } from "../../../../../shared/static/StaticLayersData";
 import { graphicsLayer } from "../../helpers/Layer.api";
 const Header = () => {
     const dispatch = useDispatch();
-    const { view } = useSelector((state) => state.CompassV3);
+    const { view, FeatureLayer } = useSelector((state) => state.CompassV3);
 
     const ClearChat = () => {
         dispatch(ClearMessage());
@@ -22,7 +22,7 @@ const Header = () => {
         //         easing: "ease-in-out",
         //     }
         // );
-        Parcels.definitionExpression = "1=1";
+        FeatureLayer.definitionExpression = "1=1";
     };
     return (
         <>

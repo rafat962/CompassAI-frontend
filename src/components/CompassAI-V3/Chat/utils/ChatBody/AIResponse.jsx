@@ -12,7 +12,6 @@ import {
 import { useSelector } from "react-redux";
 import AiResponseSql from "./utils/AiResponseSql";
 import ChartDisplay from "./utils/ChartDisplay";
-import { Parcels } from "../../../../../shared/static/StaticLayersData";
 import ReportResponse from "./utils/ReportResponse";
 
 const AIResponse = ({ data, CopyResponse }) => {
@@ -31,7 +30,6 @@ const AIResponse = ({ data, CopyResponse }) => {
             case "aggregation":
                 console.log("aggregation");
                 const aggregationData = FinalData?.data;
-                console.log(aggregationData);
                 applyAggregation(aggregationData, FeatureLayer).then((res) => {
                     console.log("finalRes", res);
                     setMessage(res);
@@ -39,16 +37,15 @@ const AIResponse = ({ data, CopyResponse }) => {
                 break;
             case "visualize":
                 if (!FinalData.renderer) return setMessage("Invalid Field");
-                const geometryType = Parcels.geometryType;
-                const aiRenderer = JSON.parse(
-                    JSON.stringify(FinalData?.renderer)
-                );
+                const geometryType = FeatureLayer.geometryType;
+                const aiRenderer = FinalData?.renderer;
                 console.log("aiRenderer", aiRenderer);
+                console.log("FeatureLayer", FeatureLayer);
                 const fixedRenderer = fixRendererForGeometry(
                     aiRenderer,
                     geometryType
                 );
-                Parcels.renderer = fixedRenderer;
+                FeatureLayer.renderer = fixedRenderer;
                 setMessage(FinalData.message);
                 break;
             case "chart":
@@ -57,7 +54,6 @@ const AIResponse = ({ data, CopyResponse }) => {
                 break;
             case "report":
                 console.log("report", FinalData.data);
-                let sampleData = {};
                 setMessage(<ReportResponse data={FinalData.data} />);
                 break;
             case "metadata":

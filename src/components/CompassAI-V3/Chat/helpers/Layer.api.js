@@ -126,23 +126,29 @@ function fixSymbolTypeForGeometry(symbol, geometryType) {
 function fixRendererForGeometry(renderer, geometryType) {
     if (!renderer || !geometryType) return renderer;
 
+    // 🧩 اعمل نسخة جديدة بالكامل (عشان تتجنب تعديل كائن ArcGIS مباشر)
+    const fixedRenderer = JSON.parse(JSON.stringify(renderer));
+
     // عدّل الرموز في uniqueValueInfos مباشرة
-    if (renderer.uniqueValueInfos && Array.isArray(renderer.uniqueValueInfos)) {
-        for (let i = 0; i < renderer.uniqueValueInfos.length; i++) {
-            const info = renderer.uniqueValueInfos[i];
+    if (
+        fixedRenderer.uniqueValueInfos &&
+        Array.isArray(fixedRenderer.uniqueValueInfos)
+    ) {
+        for (let i = 0; i < fixedRenderer.uniqueValueInfos.length; i++) {
+            const info = fixedRenderer.uniqueValueInfos[i];
             info.symbol = fixSymbolTypeForGeometry(info.symbol, geometryType);
         }
     }
 
     // عدّل الـ defaultSymbol
-    if (renderer.defaultSymbol) {
-        renderer.defaultSymbol = fixSymbolTypeForGeometry(
-            renderer.defaultSymbol,
+    if (fixedRenderer.defaultSymbol) {
+        fixedRenderer.defaultSymbol = fixSymbolTypeForGeometry(
+            fixedRenderer.defaultSymbol,
             geometryType
         );
     }
 
-    return renderer;
+    return fixedRenderer;
 }
 
 // --------------------------- Aggregation ---------------------------
