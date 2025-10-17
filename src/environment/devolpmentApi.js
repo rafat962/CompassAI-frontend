@@ -12,8 +12,8 @@ const BASE_URL =
 // const backendImagesUrl = "http://localhost/";
 // const backendUrl = "http://192.168.1.132:8000/api/v1/";
 // const backendImagesUrl = "http://192.168.1.132:8000/";
-const backendUrl = "http://127.0.0.1:8000/api/v1/";
-const backendImagesUrl = "http://127.0.0.1:8000/";
-// const backendUrl = "https://compassai.sevoice.com/api/v1/";
-// const backendImagesUrl = "https://compassai.sevoice.com/";
+// const backendUrl = "http://127.0.0.1:8000/api/v1/";
+// const backendImagesUrl = "http://127.0.0.1:8000/";
+const backendUrl = "https://compassai.sevoice.com/api/v1/";
+const backendImagesUrl = "https://compassai.sevoice.com/";
 export { client_id, client_secret, BASE_URL, backendUrl, backendImagesUrl };
