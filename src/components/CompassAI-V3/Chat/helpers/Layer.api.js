@@ -153,6 +153,7 @@ function fixRendererForGeometry(renderer, geometryType) {
 
 // --------------------------- Aggregation ---------------------------
 
+// --------------------------- Aggregation ---------------------------
 async function applyAggregation(aggregationData, featureLayer) {
     try {
         if (
@@ -166,30 +167,69 @@ async function applyAggregation(aggregationData, featureLayer) {
 
         const layer = featureLayer;
         const query = layer.createQuery();
-
-        // ✅ استخدم الشرط الصحيح من مخرج الـ AI
         query.where = aggregationData.where || "1=1";
 
-        // ✅ لو فيه groupByField نستخدمه
+        const agg = aggregationData.aggregations[0];
+        const supportedStats = [
+            "sum",
+            "avg",
+            "min",
+            "max",
+            "count",
+            "stddev",
+            "var",
+        ];
+
+        // ✅ لو نوع الإحصاء غير مدعوم (mode مثلاً) نحسبه يدويًا
+        if (!supportedStats.includes(agg.statisticType)) {
+            console.log(`⚙️ Custom aggregation for type: ${agg.statisticType}`);
+
+            // اجلب البيانات كلها مؤقتاً
+            const result = await layer.queryFeatures(query);
+            if (!result.features || result.features.length === 0) {
+                return "No data found for aggregation.";
+            }
+
+            const values = result.features.map(
+                (f) => f.attributes[agg.onField]
+            );
+
+            let output = "";
+
+            if (agg.statisticType === "mode") {
+                // 🧮 احسب أكتر قيمة متكررة
+                const freq = {};
+                for (const val of values) {
+                    if (val != null) freq[val] = (freq[val] || 0) + 1;
+                }
+                const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+                const [modeValue, modeCount] = sorted[0] || ["N/A", 0];
+                output = `Most common ${agg.onField}: ${modeValue} (appears ${modeCount} times)`;
+            } else {
+                output = `Unsupported aggregation type: ${agg.statisticType}`;
+            }
+
+            return output;
+        }
+
+        // ✅ الأنواع المدعومة نرسلها للسيرفر
         if (aggregationData.groupByField) {
             query.groupByFieldsForStatistics = [aggregationData.groupByField];
         }
 
-        // ✅ إعداد الإحصائيات
         query.outStatistics = aggregationData.aggregations.map((agg) => ({
             onStatisticField: agg.onField,
-            outStatisticFieldName: agg.onField,
+            outStatisticFieldName: agg.outField || agg.onField,
             statisticType: agg.statisticType,
         }));
-        console.log("query", query);
-        // تنفيذ الكويري
-        const result = await layer.queryFeatures(query);
 
+        console.log("query", query);
+
+        const result = await layer.queryFeatures(query);
         if (result.features.length > 0) {
             const stats = result.features.map((f) => f.attributes);
             console.log("✅ Aggregation result:", stats);
 
-            // تجهيز الملخص
             const summary = stats
                 .map((s) =>
                     Object.entries(s)
@@ -200,7 +240,6 @@ async function applyAggregation(aggregationData, featureLayer) {
 
             return `Aggregation results → ${summary}`;
         } else {
-            console.log("⚠️ No features returned from aggregation.");
             return "No data found for aggregation.";
         }
     } catch (err) {

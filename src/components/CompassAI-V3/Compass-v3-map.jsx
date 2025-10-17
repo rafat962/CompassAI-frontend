@@ -49,9 +49,10 @@ const CompassV3Map = () => {
             if (layerUrl) {
                 dispatch(ToggleLayerUrl(layer));
             }
-
             const featureLayer = new FeatureLayer({
-                portalItem: { id: portalId },
+                portalItem: {
+                    id: portalId,
+                },
             });
             if (portalId) {
                 dispatch(ToggleFeatureLayer(featureLayer));

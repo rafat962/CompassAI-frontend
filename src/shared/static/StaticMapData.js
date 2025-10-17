@@ -1,6 +1,6 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import esriConfig from "@arcgis/core/config.js";
-esriConfig.apiKey = JSON.parse(localStorage.getItem("LayerToken"));
+// import esriConfig from "@arcgis/core/config.js";
+// esriConfig.apiKey = JSON.parse(localStorage.getItem("LayerToken"));
 
 // pevouts
 /*
