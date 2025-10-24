@@ -71,7 +71,7 @@ const ChatStyle = () => {
     return (
         <form
             onSubmit={handleSubmit(onValid)}
-            className="w-full h-full flex flex-col items-center justify-start space-y-2"
+            className="w-full h-full flex flex-col items-center justify-start space-y-2 overflow-auto"
         >
             {/* header */}
             <div className="fr w-full border-b-2 border-b-blue-800 p-0 ">

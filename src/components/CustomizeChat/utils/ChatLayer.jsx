@@ -51,7 +51,7 @@ const ChatLayer = () => {
         <>
             <form
                 onSubmit={handleSubmit(onValid)}
-                className="w-full h-full flex flex-col items-center justify-start border-r-2 border-r-blue-950 space-y-2 px-2"
+                className="w-full overflow-auto h-full flex flex-col items-center justify-start border-r-2 border-r-blue-950 space-y-2 px-2"
             >
                 {/* header */}
                 <div className="fr w-full border-b-2 border-b-blue-900 p-0 mr-3">
