@@ -37,7 +37,6 @@ const MessageBox = () => {
     // send Message
     const { isPending, SendMessageMutate } = useSendMessage();
     const onSuccess = (data) => {
-        console.log(layerUrl);
         const message = data.message;
         if (message.length < 4) {
             return;

@@ -5,10 +5,7 @@ const SystemMessage = ({ item, selectField }) => {
     return (
         <div className="flex w-full flex-col items-center justify-center space-y-4">
             <div className="flex items-center shadow-md ring-2 ring-sky-300 select-none cursor-pointer justify-center rounded-full px-6 py-1 ">
-                <h1 className="text-md font-sec">
-                    Available Fields ({" "}
-                    <span className="text-blue-800">{item.alias}</span> )
-                </h1>
+                <h1 className="text-md font-sec">Available Fields</h1>
             </div>
             <div className="flex items-center justify-center space-x-2 flex-wrap">
                 {/* item */}
