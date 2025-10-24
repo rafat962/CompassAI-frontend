@@ -18,13 +18,26 @@ const ChatStyle = () => {
     });
     function onValid(data) {
         console.log(data);
+
+        // خُد القيم القديمة أولاً
+        const currentParams = Object.fromEntries([...searchParams]);
+
+        // صفّي الداتا الجديدة
         let filterForm = {};
         Object.keys(data).forEach((key) => {
             if (data[key] !== "" && data[key] != undefined) {
                 filterForm[key] = data[key];
+            } else {
+                // لو الحقل فاضي، احذف المفتاح من params
+                delete currentParams[key];
             }
         });
-        setSearchParams(filterForm);
+
+        // دمج القديم مع الجديد
+        const mergedParams = { ...currentParams, ...filterForm };
+
+        // تحديث الـ params
+        setSearchParams(mergedParams);
     }
     function resetForm() {
         // 1️⃣ القيم الافتراضية للفورم
