@@ -10,6 +10,7 @@ import CompassAIV1 from "./components/compassAI-v1/compassAI-v1";
 import CompassAIV2 from "./components/CompassAI-V2/CompassAI-V2";
 import CompassAIV3 from "./components/CompassAI-V3/CompassAI-V3";
 import Share from "./shared/ui/Share";
+import CustomizeChat from "./components/CustomizeChat/CustomizeChat";
 const AppContainer = styled.div`
     box-sizing: border-box;
     padding: 0px;
@@ -36,6 +37,10 @@ const routs = createBrowserRouter([
                     { path: "/CompassAI-V2", element: <CompassAIV2 /> },
                     { path: "/CompassAI-V3", element: <CompassAIV3 /> },
                 ],
+            },
+            {
+                path: "customChat",
+                element: <CustomizeChat />,
             },
             {
                 path: "/share",

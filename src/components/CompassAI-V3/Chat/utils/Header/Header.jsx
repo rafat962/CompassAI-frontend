@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { ClearMessage } from "../../redux/Compass-V3Slice";
 import { Parcels } from "../../../../../shared/static/StaticLayersData";
 import { graphicsLayer } from "../../helpers/Layer.api";
+import { useSearchParams } from "react-router-dom";
 const Header = () => {
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const { view, FeatureLayer } = useSelector((state) => state.CompassV3);
-
     const ClearChat = () => {
         dispatch(ClearMessage());
         view.view.graphics.removeAll();
@@ -36,7 +37,9 @@ const Header = () => {
                             alt=""
                         />
                     </div>
-                    <p className="font-sec text-blue-50 font-semibold select-none text-sm md:text-lg">
+                    <p
+                        className={`${searchParams.get("headerFont") ? `font-${searchParams.get("headerFont")}` : "font-sec"} text-blue-50 font-semibold select-none text-sm md:text-lg`}
+                    >
                         CompassAI V3
                     </p>
                 </div>

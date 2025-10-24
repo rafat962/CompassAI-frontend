@@ -14,6 +14,7 @@ import { useSendMessage } from "../../hooks/useChat";
 import toast from "react-hot-toast";
 import { ParcelsUrl } from "../../../../../shared/static/StaticLayersData";
 import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
+import { useSearchParams } from "react-router-dom";
 /**
  * @typedef {Object} MessageInterface
  * @property {string} role
@@ -21,6 +22,7 @@ import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
  */
 
 const MessageBox = () => {
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const { view, selectedField, layerUrl } = useSelector(
         (state) => state.CompassV3
@@ -93,15 +95,24 @@ const MessageBox = () => {
     };
     return (
         <>
-            <div className="bg-gradient-to-r from-transparent via-blue-800 to-transparent h-[1.5px] w-full" />
+            <div className=" bg-gradient-to-r from-transparent via-blue-800 to-transparent h-[1.5px] w-full" />
             {/* serachBar */}
             <div className="flex w-full h-full p-1 md:p-4 trans">
                 {/* search body */}
                 <form
                     onSubmit={handleSubmit(onSuccess)}
                     onKeyDown={(e) => SubmitWithEnter(e)}
+                    style={
+                        searchParams.get("textAreaColor")
+                            ? {
+                                  backgroundColor:
+                                      searchParams.get("textAreaColor"),
+                              }
+                            : {}
+                    }
                     className={`flex flex-col items-center justify-center h-fit w-full 
-                                focus-within:border-blue-800 rounded-2xl md:rounded-4xl bg-neutral-300
+                                focus-within:border-blue-800 rounded-2xl md:rounded-4xl 
+                                 bg-neutral-300
                                 dark:bg-neutral-800 
                                     px-2 md:px-4 py-1 md:py-2 border border-white shadow-sm`}
                 >
@@ -115,7 +126,7 @@ const MessageBox = () => {
                         placeholder="Type your message..."
                         rows={1}
                         onInput={handleInput}
-                        className={` w-full trans resize-none bg-transparent focus:outline-none overflow-auto max-h-20 md:max-h-30 row-start-1 px-4 my-1`}
+                        className={` w-full ${searchParams.get("textAreaFont") ? `font-${searchParams.get("textAreaFont")}` : "font-sans"} trans resize-none bg-transparent focus:outline-none overflow-auto max-h-20 md:max-h-30 row-start-1 px-4 my-1`}
                     />
                     {/* actions */}
                     <div className="flex items-center justify-between w-full py-1 md:py-2 px-2">
