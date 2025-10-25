@@ -5,6 +5,7 @@ import Point from "@arcgis/core/geometry/Point";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Polyline from "@arcgis/core/geometry/Polyline";
 // --------------------------- Export ---------------------------
+import * as projection from "@arcgis/core/geometry/projection.js";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine.js";
@@ -1519,40 +1520,50 @@ async function setLayerBuffer(
     try {
         console.log("🔹 Applying buffer on:", featureLayer.title);
 
-        // 🧹 0️⃣ امسح أي بافر قديم
+        // 🧹 امسح أي بافر قديم
         const existingBufferLayer = view.map.findLayerById("buffer-layer");
-        if (existingBufferLayer) {
-            console.log("🧽 Removing old buffer layer...");
-            view.map.remove(existingBufferLayer);
-        }
+        if (existingBufferLayer) view.map.remove(existingBufferLayer);
 
-        // ⛏️ 1️⃣ استعلام العناصر
+        // ⛏️ استعلام العناصر
         const query = featureLayer.createQuery();
         query.where = whereClause || "1=1";
         query.returnGeometry = true;
-
         const result = await featureLayer.queryFeatures(query);
+
         if (!result.features?.length) {
-            console.warn("⚠️ No features found for buffer query.");
             return { status: "error", message: "No features found." };
         }
 
-        // 🎨 2️⃣ تحديد نوع الطبقة
         const geometryType = result.features[0].geometry.type;
         console.log("🧩 Geometry Type:", geometryType);
 
-        // 🧮 3️⃣ إنشاء البافر حسب النوع
-        const bufferGeometries = result.features.map((f) =>
+        // 🗺️ تأكد من تحميل مكتبة التحويل
+        await projection.load();
+
+        // 🧭 تأكد أن كل المعالم في نظام إحداثيات خطي
+        const projectedFeatures = result.features.map((f) => {
+            const geom = f.geometry;
+            if (geom.spatialReference.isGeographic) {
+                return {
+                    ...f,
+                    geometry: projection.project(geom, {
+                        wkid: 3857, // Web Mercator
+                    }),
+                };
+            }
+            return f;
+        });
+
+        // 🧮 إنشاء البافر
+        const bufferGeometries = projectedFeatures.map((f) =>
             geometryEngine.buffer(f.geometry, distanceMeters, "meters")
         );
-
-        // لو في أكتر من feature نعملهم union
         const unionGeometry =
             bufferGeometries.length > 1
                 ? geometryEngine.union(bufferGeometries)
                 : bufferGeometries[0];
 
-        // 🖌️ 4️⃣ إعداد اللون (تحويل من hex إلى RGBA)
+        // 🎨 إعداد اللون
         const hexToRGBA = (hex, alpha) => {
             const bigint = parseInt(hex.replace("#", ""), 16);
             const r = (bigint >> 16) & 255;
@@ -1560,11 +1571,10 @@ async function setLayerBuffer(
             const b = bigint & 255;
             return [r, g, b, alpha];
         };
+        const fillColor = hexToRGBA(colorHex, 0.2);
+        const outlineColor = hexToRGBA(colorHex, 1);
 
-        const fillColor = hexToRGBA(colorHex, 0.2); // 20% fill
-        const outlineColor = hexToRGBA(colorHex, 1); // solid border
-
-        // ✨ 5️⃣ إنشاء Graphic مناسب
+        // 🖌️ إعداد الرمز
         const bufferLayer = new GraphicsLayer({ id: "buffer-layer" });
         const bufferGraphic = new Graphic({
             geometry: unionGeometry,
@@ -1575,26 +1585,10 @@ async function setLayerBuffer(
             },
         });
 
-        // ⚙️ لو Point أو Line → نستخدم رمز مختلف
-        if (geometryType === "point") {
-            bufferGraphic.symbol = {
-                type: "simple-fill",
-                color: fillColor,
-                outline: { color: outlineColor, width: 1.5 },
-            };
-        } else if (geometryType === "polyline") {
-            bufferGraphic.symbol = {
-                type: "simple-fill",
-                color: fillColor,
-                outline: { color: outlineColor, width: 2 },
-            };
-        }
-
-        // 📍 6️⃣ أضف البافر إلى الخريطة
         bufferLayer.add(bufferGraphic);
         view.map.add(bufferLayer);
 
-        // 🔍 7️⃣ زوّم على النتيجة
+        // 🔍 زوّم على النتيجة
         await view.goTo(unionGeometry.extent.expand(1.2));
 
         console.log("✅ Buffer displayed successfully.");
