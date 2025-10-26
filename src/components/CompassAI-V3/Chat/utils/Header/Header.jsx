@@ -2,8 +2,7 @@ import React from "react";
 import { LuRefreshCcw } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { ClearMessage } from "../../redux/Compass-V3Slice";
-import { Parcels } from "../../../../../shared/static/StaticLayersData";
-import { graphicsLayer } from "../../helpers/Layer.api";
+import { graphicsLayer } from "../../helpers/sql.api";
 import { useSearchParams } from "react-router-dom";
 const Header = () => {
     const [searchParams] = useSearchParams();

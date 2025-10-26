@@ -4,20 +4,20 @@ import React, { useEffect, useState } from "react";
 import { TextGenerateEffect } from "../../../../../shared/ui/aceternityUI/TextGenerateEffect";
 import { Tooltip } from "@mui/material";
 import { LuCopy } from "react-icons/lu";
-import {
-    applyAggregation,
-    executeExport,
-    fixRendererForGeometry,
-    getLandmarksData,
-    getLayerData,
-    setLayerBuffer,
-    setLayerLabel,
-    zoomToFeatures,
-} from "../../helpers/Layer.api";
 import { useSelector } from "react-redux";
 import AiResponseSql from "./utils/AiResponseSql";
 import ChartDisplay from "./utils/ChartDisplay";
 import ReportResponse from "./utils/ReportResponse";
+import { getLayerData } from "../../helpers/sql.api";
+import { fixRendererForGeometry } from "../../helpers/sympology.api";
+import { applyAggregation } from "../../helpers/Aggregation.api";
+import { getLandmarksData } from "../../helpers/LandMark.api";
+import { executeExport } from "../../helpers/export.api";
+import { setLayerLabel } from "../../helpers/lable.api";
+import { zoomToFeatures } from "../../helpers/Zoom.api";
+import { setLayerBuffer } from "../../helpers/Buffer.api";
+import Sympology from "./utils/Sympology";
+import BufferResponse from "./utils/BufferResponse";
 
 const AIResponse = ({ data, CopyResponse }) => {
     const [type, setType] = useState();
@@ -35,10 +35,8 @@ const AIResponse = ({ data, CopyResponse }) => {
                 setMessage(FinalData.message);
                 break;
             case "aggregation":
-                console.log("aggregation");
                 const aggregationData = FinalData?.data;
                 applyAggregation(aggregationData, FeatureLayer).then((res) => {
-                    console.log("finalRes", res);
                     setMessage(res);
                 });
                 break;
@@ -46,21 +44,19 @@ const AIResponse = ({ data, CopyResponse }) => {
                 if (!FinalData.renderer) return setMessage("Invalid Field");
                 const geometryType = FeatureLayer.geometryType;
                 const aiRenderer = FinalData?.renderer;
-                console.log("aiRenderer", aiRenderer);
-                console.log("FeatureLayer", FeatureLayer);
                 const fixedRenderer = fixRendererForGeometry(
                     aiRenderer,
                     geometryType
                 );
                 FeatureLayer.renderer = fixedRenderer;
-                setMessage(FinalData.message);
+                setMessage(
+                    <Sympology data={FinalData} FeatureLayer={FeatureLayer} />
+                );
                 break;
             case "chart":
-                console.log("chart", FinalData?.data);
                 setMessage(<ChartDisplay chartData={FinalData?.data} />);
                 break;
             case "report":
-                console.log("report", FinalData.data);
                 setMessage(<ReportResponse data={FinalData.data} />);
                 break;
             case "metadata":
@@ -77,18 +73,15 @@ const AIResponse = ({ data, CopyResponse }) => {
                 }
                 break;
             case "sql-query":
-                console.log(FinalData);
-                console.log(FinalData?.whereClause);
                 getLayerData(
                     view.view,
                     FinalData?.whereClause,
                     FeatureLayer
                 ).then((data) => {
-                    setMessage(<AiResponseSql data={data} />);
+                    setMessage(<AiResponseSql data={data} view={view.view} />);
                 });
                 break;
             case "label":
-                console.log("label");
                 let labelExpressionInfo = FinalData.data?.labelExpressionInfo;
                 let symbol = FinalData.data?.symbol;
                 let labelPlacement = FinalData.data?.labelPlacement;
@@ -103,7 +96,6 @@ const AIResponse = ({ data, CopyResponse }) => {
                 );
                 break;
             case "export":
-                console.log("export");
                 let exportSettings = FinalData.data; // الإعدادات من الباك
                 let exportMessage = FinalData.data?.message;
                 setMessage(exportMessage || "Preparing export...");
@@ -114,9 +106,7 @@ const AIResponse = ({ data, CopyResponse }) => {
                 );
                 break;
             case "zoom":
-                console.log("zoom");
                 let zoomSettings = FinalData.data; // الإعدادات من الباك
-                console.log(FinalData);
                 let zoomMessage = FinalData.data?.message;
                 setMessage(zoomMessage || "Preparing Zoom...");
                 zoomToFeatures(
@@ -126,13 +116,30 @@ const AIResponse = ({ data, CopyResponse }) => {
                 );
                 break;
             case "buffer":
-                console.log("buffer");
-                let whereClause = FinalData?.data?.whereClause; // الإعدادات من الباك
-                let distanceMeters = FinalData?.data?.distanceMeters; // الإعدادات من الباك
-                let color = FinalData?.data?.color; // الإعدادات من الباك
-                console.log(FinalData);
+                let whereClause = FinalData?.data?.whereClause;
+                let distanceMeters = FinalData?.data?.distanceMeters;
+                let color = FinalData?.data?.color;
                 let BufferMessage = FinalData.data?.message;
-                setMessage(BufferMessage || "Preparing Buffer...");
+                setMessage(
+                    <BufferResponse
+                        bufferData={{
+                            color,
+                            distanceMeters,
+                            message: BufferMessage,
+                        }}
+                        onUpdate={({ color, distance, unit }) => {
+                            console.log("ondistance", distance);
+                            // إعادة تنفيذ البافر بعد تعديل المستخدم
+                            setLayerBuffer(
+                                view.view,
+                                FeatureLayer,
+                                whereClause,
+                                distance,
+                                color
+                            );
+                        }}
+                    />
+                );
                 setLayerBuffer(
                     view.view,
                     FeatureLayer,
@@ -140,8 +147,8 @@ const AIResponse = ({ data, CopyResponse }) => {
                     distanceMeters
                 );
                 break;
+
             case "landmark-query":
-                console.log("landmark-query");
                 getLandmarksData(view.view, FinalData.data.params).then(
                     (landmarks) => {
                         console.log(landmarks);
@@ -286,7 +293,7 @@ const AIResponse = ({ data, CopyResponse }) => {
                 )}
                 {type === "visualize" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <TextGenerateEffect words={message} />
+                        {message}
                     </p>
                 )}
                 {type === "chart" && (
@@ -330,12 +337,16 @@ const AIResponse = ({ data, CopyResponse }) => {
                 )}
                 {type === "buffer" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <TextGenerateEffect words={message} />
+                        <>
+                            <p className=" text-wrap w-full">{message}</p>
+                        </>
                     </p>
                 )}
                 {/* copy */}
                 {type !== "sql-query" &&
                     type !== "chart" &&
+                    type !== "visualize" &&
+                    type !== "buffer" &&
                     type !== "report" && (
                         <div
                             onClick={() => CopyResponse(message)}

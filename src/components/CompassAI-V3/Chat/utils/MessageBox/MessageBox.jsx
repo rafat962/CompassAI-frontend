@@ -27,6 +27,7 @@ const MessageBox = () => {
     const { view, selectedField, layerUrl } = useSelector(
         (state) => state.CompassV3
     );
+    const token = searchParams.get("token");
     const { register, handleSubmit, reset, getValues } = useForm();
     useEffect(() => {
         const message = getValues("message");
@@ -57,6 +58,7 @@ const MessageBox = () => {
             {
                 message,
                 featureUrl: layerUrl,
+                token,
             },
             {
                 onSuccess: (data) => {

@@ -13,12 +13,13 @@ const MangeChat = () => {
     const { messages } = useSelector((state) => state.CompassV3);
     const dispatch = useDispatch();
     const { layerUrl } = useSelector((state) => state.CompassV3);
+    const token = searchParams.get("token");
     // get layer fields
     useEffect(() => {
         if (messages.length > 0) return;
         if (!layerUrl) return;
         getFields(
-            { featureUrl: layerUrl },
+            { featureUrl: layerUrl, token },
             {
                 onSuccess: (data) => {
                     dispatch(

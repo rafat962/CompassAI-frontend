@@ -6,6 +6,7 @@ import { ToggleSelectField } from "../../redux/Compass-V3Slice";
 import SystemMessage from "./SystemMessage";
 import UserMessage from "./UserMessage";
 import AIResponse from "./AIResponse";
+import { HiOutlineCloudArrowDown } from "react-icons/hi2";
 
 const ChatBody = () => {
     const { messages, aiLoader } = useSelector((state) => state.CompassV3);
@@ -93,14 +94,19 @@ const ChatBody = () => {
 
                     {/* Loader */}
                     {aiLoader && (
-                        <div className="pb-6 flex w-full items-start justify-start">
+                        <div className="pb-6 flex w-full items-start justify-start relative">
                             <div className="w-12 h-12">
                                 <img
                                     src="/icons8-chat-bot-96.gif"
                                     alt="loading"
-                                    className="object-fill"
+                                    className="object-fill "
                                 />
                             </div>
+                            {/* Thinking */}
+                            {/* <div className=" space-x-1 absolute left-13 top-6 w-30 h-14 bg-blue-300 rounded-tl-md rounded-2xl flex items-center justify-center">
+                                <HiOutlineCloudArrowDown className="text-xl" />
+                                <p>Sympology</p>
+                            </div> */}
                         </div>
                     )}
 

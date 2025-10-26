@@ -23,12 +23,19 @@ import CloseIcon from "@mui/icons-material/Close";
 import * as XLSX from "xlsx";
 import toast from "react-hot-toast";
 
-const AiResponseSql = ({ data }) => {
+const AiResponseSql = ({ data, view }) => {
     const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
     const [open, setOpen] = useState(false);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const [selectedRow, setSelectedRow] = useState(null);
+    // ----------------- zoom -----------------
+    const zoomTooItem = (row, id) => {
+        setSelectedRow(id);
+        view.goTo(row?.geometry);
+    };
+    // -----------------  -----------------
     const ExportToExcel = () => {
         try {
             // تحضير البيانات للتصدير
@@ -82,12 +89,12 @@ const AiResponseSql = ({ data }) => {
         <div
             className={`overflow-auto transition-all duration-500 ${
                 expanded ? "max-h-[75vh]" : "max-h-64"
-            } border rounded-2xl`}
+            } border `}
         >
             <table className="w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-300">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 sticky top-0">
                     <tr>
-                        {fields.map((field) => (
+                        {fields.slice(0, 3).map((field) => (
                             <th key={field} className="px-4 py-3">
                                 {t(field)}
                             </th>
@@ -98,9 +105,10 @@ const AiResponseSql = ({ data }) => {
                     {data.map((row, idx) => (
                         <tr
                             key={idx}
-                            className="bg-white border-b dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            className={`${selectedRow === idx ? "bg-gray-50" : "bg-white"}  border-b dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer`}
+                            onClick={() => zoomTooItem(row, idx)}
                         >
-                            {fields.map((field) => (
+                            {fields.slice(0, 3).map((field) => (
                                 <td key={field} className="px-4 py-2">
                                     {row.attributes[field] ?? "---"}
                                 </td>
@@ -118,17 +126,25 @@ const AiResponseSql = ({ data }) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
             className="relative w-full space-y-2"
-            dir="rtl"
         >
             {/* Header */}
             <div className="flex justify-between items-center">
-                <div className="text-lg text-gray-600">
-                    عدد السجلات : {data.length}
+                <div className="text-lg text-gray-800">
+                    recorde Num :{" "}
+                    <span className="font-bold">{data.length}</span>
                 </div>
+                {/* Fullscreen Dialog Button */}
+                <button
+                    onClick={handleDialogOpen}
+                    className="flex items-center justify-center cursor-pointer hover:text-blue-600  px-3 py-1 rounded-xl transition-all duration-300"
+                    title="Display"
+                >
+                    <HiArrowsPointingOut className="text-xl" />
+                </button>
 
-                <div className="flex items-center gap-2">
-                    {/* Expand/Collapse Button */}
-                    {/* <button
+                {/* <div className="flex items-center gap-2"> */}
+                {/* Expand/Collapse Button */}
+                {/* <button
                         onClick={() => setExpanded(!expanded)}
                         className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-xl transition-all duration-300"
                         title={expanded ? "إخفاء" : "توسيع"}
@@ -139,16 +155,7 @@ const AiResponseSql = ({ data }) => {
                             <HiChevronDoubleDown />
                         )}
                     </button> */}
-
-                    {/* Fullscreen Dialog Button */}
-                    <button
-                        onClick={handleDialogOpen}
-                        className="flex items-center justify-center cursor-pointer hover:text-blue-600  px-3 py-1 rounded-xl transition-all duration-300"
-                        title="Display"
-                    >
-                        <HiArrowsPointingOut className="text-xl" />
-                    </button>
-                </div>
+                {/* </div> */}
             </div>
 
             {/* Inline Table */}
@@ -197,7 +204,7 @@ const AiResponseSql = ({ data }) => {
                 >
                     <div className="flex-1 overflow-auto">
                         <div
-                            className={`overflow-auto transition-all duration-500 max-h-full border rounded-2xl`}
+                            className={`overflow-auto transition-all duration-500 max-h-full border `}
                         >
                             <table className="w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-300">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 sticky top-0">
@@ -215,8 +222,11 @@ const AiResponseSql = ({ data }) => {
                                 <tbody>
                                     {data.map((row, idx) => (
                                         <tr
+                                            onClick={() =>
+                                                zoomTooItem(row, idx)
+                                            }
                                             key={idx}
-                                            className="bg-white border-b dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            className={`${selectedRow === idx ? "bg-gray-50" : "bg-white"}  border-b dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer`}
                                         >
                                             {fields.map((field) => (
                                                 <td

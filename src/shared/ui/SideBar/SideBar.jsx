@@ -92,7 +92,7 @@ const SideBar = () => {
 
             <ListContainer>
                 <ListItem
-                    toUrl="/settings/email"
+                    toUrl="/customChat"
                     openNav={openNav}
                     name={t("الإعدادات")}
                     icon={<HiAdjustmentsVertical />}

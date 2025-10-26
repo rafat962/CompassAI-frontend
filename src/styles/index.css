@@ -86,3 +86,18 @@
     --breakpoint-lg: 105rem; */
     --breakpoint-xl: 120rem;
 }
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 5px;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
