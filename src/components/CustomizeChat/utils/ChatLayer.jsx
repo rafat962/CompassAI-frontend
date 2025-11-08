@@ -15,8 +15,6 @@ const ChatLayer = () => {
         },
     });
     function onValid(data) {
-        console.log(data);
-
         // خُد القيم القديمة أولاً
         const currentParams = Object.fromEntries([...searchParams]);
 
@@ -103,7 +101,6 @@ const ChatLayer = () => {
                 {/* Token */}
                 <div className="w-full">
                     <Controller
-                        disabled
                         key="Token"
                         name="Token"
                         control={control}

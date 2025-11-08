@@ -25,7 +25,7 @@ const CustomizeChat = () => {
                             <div className="flex items-start justify-between w-full h-full space-x-1 p-3">
                                 <ChatLayer />
                                 {/* right */}
-                                <ChatStyle />
+                                {/* <ChatStyle /> */}
                             </div>
                         </div>
                     </div>
