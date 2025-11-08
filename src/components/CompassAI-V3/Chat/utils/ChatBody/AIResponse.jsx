@@ -18,6 +18,8 @@ import { zoomToFeatures } from "../../helpers/Zoom.api";
 import { setLayerBuffer } from "../../helpers/Buffer.api";
 import Sympology from "./utils/Sympology";
 import BufferResponse from "./utils/BufferResponse";
+import LabelResponse from "./utils/LableResponse";
+import AggregationResponse from "./utils/AggregationResponse";
 
 const AIResponse = ({ data, CopyResponse }) => {
     const [type, setType] = useState();
@@ -37,7 +39,7 @@ const AIResponse = ({ data, CopyResponse }) => {
             case "aggregation":
                 const aggregationData = FinalData?.data;
                 applyAggregation(aggregationData, FeatureLayer).then((res) => {
-                    setMessage(res);
+                    setMessage(<AggregationResponse result={res} />);
                 });
                 break;
             case "visualize":
@@ -86,7 +88,30 @@ const AIResponse = ({ data, CopyResponse }) => {
                 let symbol = FinalData.data?.symbol;
                 let labelPlacement = FinalData.data?.labelPlacement;
                 let message = FinalData.data?.message;
-                setMessage(message);
+
+                // ✅ عرض واجهة التحكم LabelResponse بدل من الرسالة فقط
+                setMessage(
+                    <LabelResponse
+                        labelData={{
+                            labelExpressionInfo,
+                            symbol,
+                            labelPlacement,
+                            message,
+                        }}
+                        onUpdate={(updatedLabelData) => {
+                            // 🔹 استدعاء الدالة مع القيم الجديدة
+                            setLayerLabel(
+                                view.view,
+                                FeatureLayer,
+                                updatedLabelData.labelExpressionInfo,
+                                updatedLabelData.symbol,
+                                updatedLabelData.labelPlacement
+                            );
+                        }}
+                    />
+                );
+
+                // ⛏️ تنفيذ أول إعداد (افتراضي)
                 setLayerLabel(
                     view.view,
                     FeatureLayer,
@@ -147,7 +172,6 @@ const AIResponse = ({ data, CopyResponse }) => {
                     distanceMeters
                 );
                 break;
-
             case "landmark-query":
                 getLandmarksData(view.view, FinalData.data.params).then(
                     (landmarks) => {
@@ -283,7 +307,7 @@ const AIResponse = ({ data, CopyResponse }) => {
                 )}
                 {type === "aggregation" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <TextGenerateEffect words={message} />
+                        <p className=" text-wrap w-full">{message}</p>
                     </p>
                 )}
                 {type === "metadata" && (
@@ -308,21 +332,17 @@ const AIResponse = ({ data, CopyResponse }) => {
                 )}
                 {type === "report" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <>
-                            <p className=" text-wrap w-full">{message}</p>
-                        </>
+                        <p className=" text-wrap w-full">{message}</p>
                     </p>
                 )}
                 {type === "landmark-query" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <>
-                            <p className=" text-wrap w-full">{message}</p>
-                        </>
+                        <p className=" text-wrap w-full">{message}</p>
                     </p>
                 )}
                 {type === "label" && (
                     <p dir="ltr" className=" text-wrap w-full p-1">
-                        <TextGenerateEffect words={message} />
+                        <p className=" text-wrap w-full">{message}</p>
                     </p>
                 )}
                 {type === "export" && (
@@ -347,6 +367,8 @@ const AIResponse = ({ data, CopyResponse }) => {
                     type !== "chart" &&
                     type !== "visualize" &&
                     type !== "buffer" &&
+                    type !== "label" &&
+                    type !== "aggregation" &&
                     type !== "report" && (
                         <div
                             onClick={() => CopyResponse(message)}

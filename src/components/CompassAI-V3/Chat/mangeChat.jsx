@@ -35,7 +35,7 @@ const MangeChat = () => {
         );
     }, [layerUrl]);
     return (
-        <div className="w-full h-full flex flex-col items-between justify-between  rounded-2xl overflow-hidden  border-2 border-blue-500">
+        <div className="w-full h-full bg-white flex flex-col items-between justify-between  rounded-2xl overflow-hidden  border-2 border-blue-500">
             {/* header */}
             <div
                 style={{
