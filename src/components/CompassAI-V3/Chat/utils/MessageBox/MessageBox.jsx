@@ -24,7 +24,7 @@ import { useSearchParams } from "react-router-dom";
 const MessageBox = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
-    const { view, selectedField, layerUrl } = useSelector(
+    const { view, selectedField, layerUrl, messages } = useSelector(
         (state) => state.CompassV3
     );
     const token = searchParams.get("token");
@@ -54,11 +54,17 @@ const MessageBox = () => {
         reset({
             message: "",
         });
+        // let cleanMessages = messages.slice(-5);
+        let cleanMessages = messages;
+
+        let sendHistoryToBackend = cleanMessages;
+        console.log(sendHistoryToBackend);
         SendMessageMutate(
             {
                 message,
                 featureUrl: layerUrl,
                 token,
+                history: sendHistoryToBackend,
             },
             {
                 onSuccess: (data) => {
