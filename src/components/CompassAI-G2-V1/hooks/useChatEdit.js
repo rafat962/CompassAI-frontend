@@ -1,0 +1,22 @@
+/* eslint-disable no-unused-vars */
+import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { sendMessageApi } from "../helpers/chatEdit.api";
+
+// -------------------- Send Message --------------------
+export function useSendMessage() {
+    const { mutate: SendMessageMutate, isPending } = useMutation({
+        mutationFn: sendMessageApi,
+        onError: (error, variables, context) => {
+            // An error happened!
+            toast.error(error?.message || "");
+        },
+        onSuccess: (data, variables, context) => {
+            if (data.status === "error") {
+                return;
+            }
+            // reset();
+        },
+    });
+    return { isPending, SendMessageMutate };
+}

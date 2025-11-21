@@ -1,17 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { memo, useEffect } from "react";
-import useView from "../../shared/hooks/useView";
-import { useMap } from "../../shared/hooks/useMap";
-import { useDispatch } from "react-redux";
-import {
-    ToggleFeatureLayer,
-    ToggleLayerUrl,
-    ToggleView,
-} from "./Chat/redux/Compass-V3Slice";
 import { useSearchParams } from "react-router";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-const CompassV3Map = () => {
-    const dispatch = useDispatch();
+import { useMap } from "../../../../shared/hooks/useMap";
+import useView from "../../../../shared/hooks/useView";
+import { useCompassContext } from "../../context/CompassContext";
+
+const MapG2 = () => {
+    // const { state, dispatch } = useCompassContext();
     const { viewRef } = useMap();
     const center = [-76.4756304, 18.1923747];
     const [searchParams] = useSearchParams();
@@ -20,18 +16,19 @@ const CompassV3Map = () => {
         const loadLayer = async () => {
             const layerUrl = searchParams.get("layerUrl");
             const portalId = searchParams.get("portalId");
+            if (!portalId) return;
             const layer = `${layerUrl}/0`;
-            if (layerUrl) {
-                dispatch(ToggleLayerUrl(layer));
-            }
+            // if (layerUrl) {
+            //     dispatch({ type: "layer", layer });
+            // }
             const featureLayer = new FeatureLayer({
                 portalItem: {
                     id: portalId,
                 },
             });
-            if (portalId) {
-                dispatch(ToggleFeatureLayer(featureLayer));
-            }
+            // if (portalId) {
+            //     dispatch({ type: "featureLayer", featureLayer });
+            // }
             view.map.add(featureLayer);
 
             await featureLayer.load(); // Wait for layer to load
@@ -41,20 +38,20 @@ const CompassV3Map = () => {
             }
         };
         loadLayer();
-    }, [searchParams, view, dispatch]);
+    }, [searchParams, view]);
 
-    useEffect(() => {
-        if (view) {
-            dispatch(ToggleView({ view: view }));
-        }
-    }, [view]);
+    // useEffect(() => {
+    //     if (view) {
+    //         dispatch({ type: "view", view });
+    //     }
+    // }, [view]);
 
     return (
         <div
             ref={viewRef}
-            className="col-span-12 lg:col-span-8 row-span-3 lg:row-span-1 border-1 border-black rounded-2xl overflow-hidden"
+            className="w-full h-full border-1 border-black rounded-2xl overflow-hidden"
         ></div>
     );
 };
 
-export default memo(CompassV3Map);
+export default memo(MapG2);
