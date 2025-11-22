@@ -51,6 +51,7 @@ const handleCrudCase = async (type, layer, where, attributes) => {
                 }));
 
                 await layer.applyEdits({ updateFeatures: updates });
+                layer.refresh();
                 toast.success(
                     `Successfully updated ${updates.length} feature(s) ✔️`,
                     { duration: 3000 }
@@ -80,6 +81,8 @@ const handleCrudCase = async (type, layer, where, attributes) => {
                     `Successfully deleted ${deletes.length} feature(s) 🗑️`,
                     { duration: 3000 }
                 );
+                layer.refresh();
+
                 return "delete";
             }
 

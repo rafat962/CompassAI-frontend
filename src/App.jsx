@@ -12,7 +12,7 @@ import CompassAIV3 from "./components/CompassAI-V3/CompassAI-V3";
 import Share from "./shared/ui/Share";
 import CustomizeChat from "./components/CustomizeChat/CustomizeChat";
 import { CompassProvider } from "./components/CompassAI-G2-V1/context/CompassContext.jsx";
-import CompassAIG2V1 from "./components/CompassAI-G2-V1/CompassAI-G2-V1.JSX";
+import CompassAIG2V1 from "./components/CompassAI-G2-V1/CompassAI-G2-V1.jsx";
 const AppContainer = styled.div`
     box-sizing: border-box;
     padding: 0px;

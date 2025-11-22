@@ -5,9 +5,10 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { useMap } from "../../../../shared/hooks/useMap";
 import useView from "../../../../shared/hooks/useView";
 import { useCompassContext } from "../../context/CompassContext";
-
-const MapG2 = () => {
-    // const { state, dispatch } = useCompassContext();
+import Editor from "@arcgis/core/widgets/Editor.js";
+import Expand from "@arcgis/core/widgets/Expand";
+const MapG2 = ({ setView }) => {
+    // const { dispatch } = useCompassContext();
     const { viewRef } = useMap();
     const center = [-76.4756304, 18.1923747];
     const [searchParams] = useSearchParams();
@@ -17,25 +18,25 @@ const MapG2 = () => {
             const layerUrl = searchParams.get("layerUrl");
             const portalId = searchParams.get("portalId");
             if (!portalId) return;
-            const layer = `${layerUrl}/0`;
-            // if (layerUrl) {
-            //     dispatch({ type: "layer", layer });
-            // }
             const featureLayer = new FeatureLayer({
                 portalItem: {
                     id: portalId,
                 },
             });
-            // if (portalId) {
-            //     dispatch({ type: "featureLayer", featureLayer });
-            // }
             view.map.add(featureLayer);
-
             await featureLayer.load(); // Wait for layer to load
-
             if (featureLayer.fullExtent) {
                 view.goTo(featureLayer.fullExtent);
             }
+            const editWidget = new Editor({
+                view: view,
+            });
+            const EditExpand = new Expand({
+                view: view,
+                content: editWidget,
+            });
+            view.ui.add(EditExpand, "top-right");
+            setView(view);
         };
         loadLayer();
     }, [searchParams, view]);

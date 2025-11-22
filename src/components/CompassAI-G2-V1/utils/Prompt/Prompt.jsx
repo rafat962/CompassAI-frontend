@@ -6,7 +6,7 @@ import {
     LucideBrainCircuit,
     SplineIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { ImMap2, ImTable2, ImSpinner2 } from "react-icons/im";
@@ -15,7 +15,6 @@ import VLayer from "./VLayer/VLayer";
 import { useSendMessage } from "../../hooks/useChatEdit";
 import { useSearchParams } from "react-router";
 import { handleResponse } from "../../helpers/handleResponse";
-import Thinking from "./Thinking/Thinking";
 import toast from "react-hot-toast";
 
 const Prompt = () => {
@@ -30,9 +29,8 @@ const Prompt = () => {
         if (!message) return;
         const layerUrl = searchParams.get("layerUrl");
         let layer = `${layerUrl}/0`;
-        const { VLayerMode, VFeatureLayer, FeatureLayer } = state;
+        const { VLayerMode, VFeatureLayer, FeatureLayer, view } = state;
         setLoading(true);
-
         SendMessageMutate(
             { message: message, featureUrl: layer },
             {
@@ -47,13 +45,16 @@ const Prompt = () => {
                             layer,
                             data.result
                         );
-                        console.log(res);
                         setLoading(false);
+                    } else {
+                        setLoading(false);
+                        toast.error(data.result.error, {
+                            duration: 8000,
+                        });
                     }
                 },
                 onError: (err) => {
                     setLoading(false);
-                    console.log(err);
                     toast.error(err.message);
                 },
             }
