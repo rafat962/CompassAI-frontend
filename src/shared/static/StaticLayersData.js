@@ -4,7 +4,7 @@ const Strings = new FeatureLayer({
     portalItem: {
         id: "958bbeb057c44886bde9f1517c3f12ea", // Replace with actual item ID
     },
-    apiKey: JSON.parse(localStorage.getItem("LayerToken")),
+    // apiKey: JSON.parse(localStorage.getItem("LayerToken")),
     outFields: ["*"],
     title: "strings",
 });
@@ -126,7 +126,7 @@ const layer = new FeatureLayer({
     portalItem: {
         id: layerPortal, // Replace with actual item ID
     },
-    apiKey: JSON.parse(localStorage.getItem("LayerToken")),
+    // apiKey: JSON.parse(localStorage.getItem("LayerToken")),
     outFields: ["*"],
     title: "strings",
 });
