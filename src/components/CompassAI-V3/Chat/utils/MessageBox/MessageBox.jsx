@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { ParcelsUrl } from "../../../../../shared/static/StaticLayersData";
 import { drawGraphics } from "../../../../../shared/helpers/DrawGraphics";
 import { useSearchParams } from "react-router-dom";
+
 /**
  * @typedef {Object} MessageInterface
  * @property {string} role
@@ -25,10 +26,14 @@ const MessageBox = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const { view, selectedField, layerUrl, messages } = useSelector(
-        (state) => state.CompassV3
+        (state) => state.CompassV3,
     );
+
     const token = searchParams.get("token");
+    const ApiKey = searchParams.get("ApiKey");
+
     const { register, handleSubmit, reset, getValues } = useForm();
+
     useEffect(() => {
         const message = getValues("message");
         if (selectedField) {
@@ -37,76 +42,86 @@ const MessageBox = () => {
             });
         }
     }, [selectedField]);
+
     // send Message
     const { isPending, SendMessageMutate } = useSendMessage();
+
     const onSuccess = (data) => {
         const message = data.message;
         if (message.length < 4) {
             return;
         }
+
+        // Add user message to UI
         dispatch(
             AddMessage({
                 role: "user",
                 message,
-            })
+            }),
         );
+
         dispatch(ClearSelectField());
         reset({
             message: "",
         });
-        // let cleanMessages = messages.slice(-5);
-        let cleanMessages = messages;
 
-        let sendHistoryToBackend = cleanMessages;
-        console.log(sendHistoryToBackend);
-        SendMessageMutate(
-            {
-                message,
-                featureUrl: layerUrl,
-                token,
-                history: sendHistoryToBackend,
+        let sendHistoryToBackend = messages;
+
+        // --- Sandbox Logic Implementation ---
+        const isSandbox = ApiKey === "sandbox";
+
+        const payload = {
+            message,
+            // If sandbox, use hardcoded sample layer, else use dynamic layerUrl from redux
+            featureUrl: isSandbox
+                ? "https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer"
+                : layerUrl,
+            // If sandbox, token might be handled by backend or env, else use URL token
+            token: isSandbox ? "" : token,
+            history: sendHistoryToBackend,
+            ApiKey: ApiKey, // Will be "sandbox" or the actual key
+        };
+
+        SendMessageMutate(payload, {
+            onSuccess: (data) => {
+                if (data.status === "success") {
+                    dispatch(
+                        AddMessage({
+                            role: "ai",
+                            message: data,
+                        }),
+                    );
+                } else {
+                    toast.error(data?.message);
+                }
+                dispatch(ToggleLoader());
             },
-            {
-                onSuccess: (data) => {
-                    if (data.status === "success") {
-                        dispatch(
-                            AddMessage({
-                                role: "ai",
-                                message: data,
-                            })
-                        );
-                        dispatch(ToggleLoader());
-                    } else {
-                        toast.error(data?.message);
-                    }
-                    dispatch(ToggleLoader());
-                },
-                onError: (err) => {
-                    dispatch(ToggleLoader());
-                },
-            }
-        );
+            onError: (err) => {
+                dispatch(ToggleLoader());
+            },
+        });
     };
+
     const SubmitWithEnter = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault(); // prevent newline
-            handleSubmit(onSuccess)(); // manually trigger submit
+            e.preventDefault();
+            handleSubmit(onSuccess)();
         }
     };
+
     const textareaRef = useRef();
     const handleInput = () => {
         const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = "auto"; // reset
-            textarea.style.height = textarea.scrollHeight + "px"; // expand
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
         }
     };
+
     return (
         <>
             <div className=" bg-gradient-to-r from-transparent via-blue-800 to-transparent h-[1.5px] w-full" />
-            {/* serachBar */}
             <div className="flex w-full h-full p-1 md:p-4 trans">
-                {/* search body */}
                 <form
                     onSubmit={handleSubmit(onSuccess)}
                     onKeyDown={(e) => SubmitWithEnter(e)}
@@ -124,30 +139,27 @@ const MessageBox = () => {
                                 dark:bg-neutral-800 
                                     px-2 md:px-4 py-1 md:py-2 border border-white shadow-sm`}
                 >
-                    {/* input */}
                     <textarea
                         {...register("message")}
                         ref={(e) => {
-                            register("message").ref(e); // give to RHF
-                            textareaRef.current = e; // save in your ref
+                            register("message").ref(e);
+                            textareaRef.current = e;
                         }}
                         placeholder="Type your message..."
                         rows={1}
                         onInput={handleInput}
                         className={` w-full ${searchParams.get("textAreaFont") ? `font-${searchParams.get("textAreaFont")}` : "font-sans"} trans resize-none bg-transparent focus:outline-none overflow-auto max-h-20 md:max-h-30 row-start-1 px-4 my-1`}
                     />
-                    {/* actions */}
                     <div className="flex items-center justify-between w-full py-1 md:py-2 px-2">
-                        {/* Tools */}
                         <div
                             className={`w-fit h-fit relative p-2 mr-6 col-span-1`}
                         >
                             <ControlledOpenSpeedDial />
                         </div>
-                        {/* powerd By */}
                         <a
                             href="https://raafatkamel.netlify.app/"
                             target="_blank"
+                            rel="noreferrer"
                             className="flex items-center justify-center space-x-2 group"
                         >
                             <p className=" group-hover:text-blue-600 trans tracking-widest capitalize text-sm font-sec text-gray-700">
@@ -157,8 +169,8 @@ const MessageBox = () => {
                                 <img src="/header/R.K logo.png" alt="" />
                             </div>
                         </a>
-                        {/* Send */}
                         <button
+                            type="submit"
                             className={` shadow-2xl col-span-1 flex items-center justify-center rounded-full dark:bg-blue-900 bg-sec p-2 cursor-pointer group border-1 border-sec hover:border-blue-800 dark:border-blue-800 dark:hover:border-sec trans`}
                         >
                             <LuSendHorizontal className=" text-lg group-hover:text-blue-800 dark:group-hover:text-white dark:group-hover:brightness-200  trans" />

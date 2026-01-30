@@ -6,11 +6,14 @@ import { ToggleSelectField } from "../../redux/Compass-V3Slice";
 import SystemMessage from "./SystemMessage";
 import UserMessage from "./UserMessage";
 import AIResponse from "./AIResponse";
-import { HiOutlineCloudArrowDown } from "react-icons/hi2";
 
 const ChatBody = () => {
     const { messages, aiLoader } = useSelector((state) => state.CompassV3);
     const dispatch = useDispatch();
+
+    // Create ref for the scrollable container
+    const containerRef = useRef(null);
+
     const selectField = (field) => dispatch(ToggleSelectField(field));
 
     const CopyResponse = (message) => {
@@ -21,13 +24,13 @@ const ChatBody = () => {
             .catch(() => toast.error("❌ Failed to copy message"));
     };
 
-    // ✅ ref للعنصر الأخير في الشات
-    const chatEndRef = useRef(null);
-
-    // ✅ كل ما تتغير الرسائل أو اللودر، انزل للأسفل
+    // Scroll to bottom without triggering parent page jump
     useEffect(() => {
-        if (chatEndRef.current) {
-            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        if (containerRef.current) {
+            containerRef.current.scrollTo({
+                top: containerRef.current.scrollHeight,
+                behavior: "smooth",
+            });
         }
     }, [messages, aiLoader]);
 
@@ -56,7 +59,10 @@ const ChatBody = () => {
 
             {/* Chat messages */}
             {messages.length > 0 && (
-                <div className="w-full h-full flex flex-col items-end justify-start p-4 space-y-3 font-sec overflow-y-auto">
+                <div
+                    ref={containerRef} // Attach ref to the scrollable div
+                    className="w-full h-full flex flex-col items-end justify-start p-4 space-y-3 font-sec overflow-y-auto custom-scrollbar"
+                >
                     {messages.map((item, index) => {
                         if (item.role === "user") {
                             return (
@@ -65,7 +71,6 @@ const ChatBody = () => {
                                         item={item}
                                         CopyResponse={CopyResponse}
                                     />
-                                    {/* test */}
                                     <AIResponse
                                         item={item}
                                         CopyResponse={CopyResponse}
@@ -89,6 +94,7 @@ const ChatBody = () => {
                                 />
                             );
                         }
+                        return null;
                     })}
 
                     {/* Loader */}
@@ -98,19 +104,11 @@ const ChatBody = () => {
                                 <img
                                     src="/icons8-chat-bot-96.gif"
                                     alt="loading"
-                                    className="object-fill "
+                                    className="object-fill"
                                 />
                             </div>
-                            {/* Thinking */}
-                            {/* <div className=" space-x-1 absolute left-13 top-6 w-30 h-14 bg-blue-300 rounded-tl-md rounded-2xl flex items-center justify-center">
-                                <HiOutlineCloudArrowDown className="text-xl" />
-                                <p>Sympology</p>
-                            </div> */}
                         </div>
                     )}
-
-                    {/* ✅ العنصر المرجعي اللي بنسحب له */}
-                    <div ref={chatEndRef}></div>
                 </div>
             )}
         </>

@@ -10,36 +10,59 @@ import {
 } from "./Chat/redux/Compass-V3Slice";
 import { useSearchParams } from "react-router";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+
 const CompassV3Map = () => {
     const dispatch = useDispatch();
     const { viewRef } = useMap();
-    const center = [-76.4756304, 18.1923747];
+    const center = [0, 0];
     const [searchParams] = useSearchParams();
-    const { view } = useView(viewRef, 18, center, "satellite", false);
+    const { view } = useView(viewRef, 2, center, "satellite", false);
+
     useEffect(() => {
         const loadLayer = async () => {
-            const layerUrl = searchParams.get("layerUrl");
-            const portalId = searchParams.get("portalId");
-            const layer = `${layerUrl}/0`;
-            if (layerUrl) {
-                dispatch(ToggleLayerUrl(layer));
-            }
-            const featureLayer = new FeatureLayer({
-                portalItem: {
-                    id: portalId,
-                },
-            });
-            if (portalId) {
+            if (!view) return; // Ensure view is ready
+
+            // 1. Check if we are in Sandbox Mode
+            const apiKeyParam = searchParams.get("ApiKey");
+            const isSandbox = apiKeyParam === "sandbox";
+
+            // 2. Define Data (Use default if sandbox, otherwise use URL params)
+            const portalId = isSandbox
+                ? "810c4f24fa0947e58ad8a0986b5fb63d" // Fixed ID for sandbox
+                : searchParams.get("portalId");
+
+            const layerUrl = isSandbox
+                ? "https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer"
+                : searchParams.get("layerUrl");
+
+            if (!portalId || !layerUrl) return;
+
+            // 3. Dispatch Layer URL for the Chat logic
+            const layerPath = `${layerUrl}/0`;
+            dispatch(ToggleLayerUrl(layerPath));
+
+            try {
+                // 4. Create and Add Feature Layer
+                const featureLayer = new FeatureLayer({
+                    portalItem: {
+                        id: portalId,
+                    },
+                });
+
                 dispatch(ToggleFeatureLayer(featureLayer));
-            }
-            view.map.add(featureLayer);
+                view.map.add(featureLayer);
 
-            await featureLayer.load(); // Wait for layer to load
+                await featureLayer.load();
 
-            if (featureLayer.fullExtent) {
-                view.goTo(featureLayer.fullExtent);
+                // 5. Zoom to layer extent
+                if (featureLayer.fullExtent) {
+                    view.goTo(featureLayer.fullExtent);
+                }
+            } catch (error) {
+                console.error("Error loading ArcGIS layer:", error);
             }
         };
+
         loadLayer();
     }, [searchParams, view, dispatch]);
 
@@ -47,12 +70,12 @@ const CompassV3Map = () => {
         if (view) {
             dispatch(ToggleView({ view: view }));
         }
-    }, [view]);
+    }, [view, dispatch]);
 
     return (
         <div
             ref={viewRef}
-            className="col-span-12 lg:col-span-8 row-span-3 lg:row-span-1 border-1 border-black rounded-2xl overflow-hidden"
+            className="col-span-12 md:col-span-8 row-span-3 md:row-span-1 border-1 border-white/10 rounded-2xl overflow-hidden shadow-2xl bg-black/20"
         ></div>
     );
 };
