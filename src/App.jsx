@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -13,6 +13,7 @@ import Share from "./shared/ui/Share";
 import CustomizeChat from "./components/CustomizeChat/CustomizeChat";
 import { CompassProvider } from "./components/CompassAI-G2-V1/context/CompassContext.jsx";
 import CompassAIG2V1 from "./components/CompassAI-G2-V1/CompassAI-G2-V1.jsx";
+import getToken from "./shared/helpers/GetToken.js";
 const AppContainer = styled.div`
     box-sizing: border-box;
     padding: 0px;
@@ -61,6 +62,16 @@ const routs = createBrowserRouter([
                     </Share>
                 ),
             },
+            {
+                path: "share/edit-mode",
+                element: (
+                    <Share>
+                        <CompassProvider>
+                            <CompassAIG2V1 />
+                        </CompassProvider>
+                    </Share>
+                ),
+            },
         ],
     },
     // {
@@ -79,8 +90,11 @@ function App() {
                     mode: currentMode,
                 },
             }),
-        [currentMode]
+        [currentMode],
     );
+    useEffect(() => {
+        getToken();
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>

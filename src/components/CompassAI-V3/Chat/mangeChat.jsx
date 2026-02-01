@@ -13,17 +13,24 @@ const MangeChat = () => {
     const { messages } = useSelector((state) => state.CompassV3);
     const dispatch = useDispatch();
     const { layerUrl } = useSelector((state) => state.CompassV3);
+    const ApiKey = searchParams.get("ApiKey");
     const token = searchParams.get("token");
     // get layer fields
     useEffect(() => {
         if (messages.length > 0) return;
         if (!layerUrl) return;
         getFields(
-            { featureUrl: layerUrl, token },
+            {
+                featureUrl: layerUrl,
+                token:
+                    ApiKey == "sandbox"
+                        ? JSON.parse(localStorage.getItem("LayerToken"))
+                        : token,
+            },
             {
                 onSuccess: (data) => {
                     dispatch(
-                        AddFields({ fields: data.fields, name: data.name })
+                        AddFields({ fields: data.fields, name: data.name }),
                     );
                 },
             },
@@ -31,7 +38,7 @@ const MangeChat = () => {
                 onError: (error) => {
                     toast.error(error?.message || "");
                 },
-            }
+            },
         );
     }, [layerUrl]);
     return (

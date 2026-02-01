@@ -28,11 +28,11 @@ const CompassV3Map = () => {
 
             // 2. Define Data (Use default if sandbox, otherwise use URL params)
             const portalId = isSandbox
-                ? "810c4f24fa0947e58ad8a0986b5fb63d" // Fixed ID for sandbox
+                ? import.meta.env.VITE_PORTALID // Fixed ID for sandbox
                 : searchParams.get("portalId");
 
             const layerUrl = isSandbox
-                ? "https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer"
+                ? import.meta.env.VITE_FEATURE
                 : searchParams.get("layerUrl");
 
             if (!portalId || !layerUrl) return;

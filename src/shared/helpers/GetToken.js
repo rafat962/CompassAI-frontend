@@ -13,7 +13,7 @@ async function getToken() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-        }
+        },
     );
     const Data = await res.json();
     localStorage.setItem("LayerToken", JSON.stringify(Data.access_token));

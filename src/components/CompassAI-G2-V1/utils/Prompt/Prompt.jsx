@@ -1,11 +1,5 @@
 /* eslint-disable no-unused-vars */
-import {
-    Highlighter,
-    Loader,
-    Loader2,
-    LucideBrainCircuit,
-    SplineIcon,
-} from "lucide-react";
+import { LucideBrainCircuit } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -24,31 +18,39 @@ const Prompt = () => {
     const { isPending, SendMessageMutate } = useSendMessage();
     const { state, dispatch } = useCompassContext();
     const { register, handleSubmit } = useForm();
+
     const onSuccess = (data) => {
         let { message } = data;
         if (!message) return;
         const layerUrl = searchParams.get("layerUrl");
-        let layer = `${layerUrl}/0`;
-        const { VLayerMode, VFeatureLayer, FeatureLayer, view } = state;
+        const ApiKey = searchParams.get("ApiKey");
+        const isSandbox = ApiKey === "sandbox";
+
+        const Localtoken = searchParams.get("token");
+        let token = isSandbox
+            ? JSON.parse(localStorage.getItem("LayerToken"))
+            : Localtoken;
+        let layer = `${isSandbox ? import.meta.env.VITE_FEATURE : layerUrl}/0`;
+        const { VLayerMode, VFeatureLayer, FeatureLayer } = state;
+
         setLoading(true);
         SendMessageMutate(
-            { message: message, featureUrl: layer },
+            { message: message, featureUrl: layer, ApiKey, token },
             {
                 onSuccess: async (data) => {
+                    console.log("data", data);
                     if (
-                        data.status == "success" &&
-                        data.result.status == "success"
+                        data?.status === "success" &&
+                        data?.result.status === "success"
                     ) {
-                        let layer = VLayerMode ? VFeatureLayer : FeatureLayer;
-                        const res = await handleResponse(
-                            data.type,
-                            layer,
-                            data.result
-                        );
                         setLoading(false);
+                        let layerObj = VLayerMode
+                            ? VFeatureLayer
+                            : FeatureLayer;
+                        await handleResponse(data.type, layerObj, data.result);
                     } else {
                         setLoading(false);
-                        toast.error(data.result.error, {
+                        toast.error(data.result.error || "Error occurred", {
                             duration: 8000,
                         });
                     }
@@ -57,81 +59,80 @@ const Prompt = () => {
                     setLoading(false);
                     toast.error(err.message);
                 },
-            }
+            },
         );
     };
-    // Handle Display Item
+
     function ChangeDisplay(item) {
         setDisplayItem(item);
         dispatch({ type: "mode", status: item });
     }
+
     return (
-        <div className="w-full h-fit p-2 m-1 flex items-center justify-between">
-            <div className="flex items-center w-25 justify-center space-x-1 px-4 h-17 bg-white rounded-xl shadow-[0_4px_20px_rgba(80,120,255,0.45)]">
-                {/* map */}
+        <div className="w-full h-fit p-2 flex flex-col md:flex-row items-center justify-between gap-3 lg:gap-4">
+            {/* Display Toggle - Responsive Width */}
+            <div className="flex items-center justify-center space-x-1 px-3 h-14 md:h-16 bg-white rounded-xl shadow-[0_4px_20px_rgba(80,120,255,0.45)] w-full md:w-auto">
                 <div
                     onClick={() => ChangeDisplay("map")}
-                    className={`${displayItem === "map" && "bg-blue-100"} p-2 cursor-pointer rounded-md hover:bg-blue-100 trans`}
+                    className={`${displayItem === "map" ? "bg-blue-100" : ""} p-3 cursor-pointer rounded-md hover:bg-blue-100 transition-colors`}
                 >
-                    <ImMap2 className="text-xl " />
+                    <ImMap2 className="text-xl md:text-2xl" />
                 </div>
-                {/* table */}
                 <div
                     onClick={() => ChangeDisplay("table")}
-                    className={`${displayItem === "table" && "bg-blue-100"} p-2 cursor-pointer rounded-md  hover:bg-blue-100 trans`}
+                    className={`${displayItem === "table" ? "bg-blue-100" : ""} p-3 cursor-pointer rounded-md hover:bg-blue-100 transition-colors`}
                 >
-                    <ImTable2 className="text-xl cursor-pointer " />
+                    <ImTable2 className="text-xl md:text-2xl" />
                 </div>
-                {/* Two */}
             </div>
+
+            {/* Main Form - Dynamic width and height */}
             <motion.form
                 onSubmit={handleSubmit(onSuccess)}
-                className="
-                    relative flex items-center justify-between w-[70%] h-17 bg-white 
-                    rounded-xl  outline-3 outline-gray-300 px-4 focus-within:outline-blue-500
-                "
+                className="relative flex items-center justify-between w-full md:max-w-[60%] lg:max-w-[70%] min-h-[56px] md:h-16 bg-white rounded-xl outline outline-2 outline-gray-200 px-3 md:px-4 focus-within:outline-blue-500 transition-all"
                 animate={
-                    loading
+                    isPending
                         ? {
                               boxShadow: [
-                                  "0 0 60px rgba(120,80,255,0.4)",
-                                  "0 0 60px rgba(80,150,255,0.55)",
-                                  "0 0 60px rgba(0,200,255,0.7)",
-                                  "0 0 60px rgba(80,150,255,0.55)",
-                                  "0 0 60px rgba(120,80,255,0.4)",
+                                  "0 0 20px rgba(120,80,255,0.4)",
+                                  "0 0 40px rgba(0,200,255,0.6)",
+                                  "0 0 20px rgba(120,80,255,0.4)",
                               ],
                           }
                         : {
-                              boxShadow: "0 4px 20px rgba(80,120,255,0.45)",
-                              scale: 1,
+                              boxShadow: "0 4px 20px rgba(80,120,255,0.3)",
                           }
                 }
                 transition={
-                    loading
-                        ? {
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                          }
-                        : {
-                              duration: 0.5,
-                          }
+                    isPending
+                        ? { duration: 2, repeat: Infinity }
+                        : { duration: 0.5 }
                 }
             >
                 <input
                     {...register("message")}
                     type="text"
-                    className="flex-1 outline-none h-full"
+                    placeholder="Ask Compass..."
+                    className="flex-1 outline-none bg-transparent h-full py-2 text-sm md:text-base"
                 />
+
                 <button
-                    className={`flex relative  w-48 items-center justify-center space-x-2 z-10 cursor-pointer ml-4 px-6 py-2 rounded-xl text-white font-medium bg-gradient-to-r from-purple-500 to-blue-500 shadow-[0_5px_15px_rgba(20,120,255,0.45)] hover:opacity-90 transition`}
+                    disabled={isPending}
+                    className="flex cursor-pointer items-center justify-center space-x-2 px-4 md:px-6 py-2 ml-2 rounded-xl text-white font-medium bg-gradient-to-r from-purple-500 to-blue-500 shadow-md hover:opacity-90 transition-all shrink-0"
                 >
-                    <p>Ask Compass</p>
-                    {!loading && <LucideBrainCircuit className="w-6" />}
-                    {loading && <ImSpinner2 className=" animate-spin w-6" />}
+                    <span className="hidden sm:inline text-sm md:text-base">
+                        Ask Compass
+                    </span>
+                    {isPending ? (
+                        <ImSpinner2 className="animate-spin w-5 h-5" />
+                    ) : (
+                        <LucideBrainCircuit className="w-5 h-5" />
+                    )}
                 </button>
             </motion.form>
-            <div>
+
+            {/* VLayer Wrapper */}
+            <div className="w-full md:w-auto flex justify-center md:justify-end">
                 <VLayer />
             </div>
         </div>

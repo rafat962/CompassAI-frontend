@@ -85,13 +85,13 @@ const SideBar = () => {
                     icon={<LuBrain />}
                 />
                 <ListItem
-                    toUrl="/CompassAI-V3?layerUrl=https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/Parcels_new/FeatureServer&portalId=0e77a171e98c409a929e435b13269b2e"
+                    toUrl="/CompassAI-V3?layerUrl=https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer&portalId=810c4f24fa0947e58ad8a0986b5fb63d"
                     openNav={openNav}
                     name={t("Compass-V3")}
                     icon={<LuBrain />}
                 />
                 <ListItem
-                    toUrl="/CompassAI-G1-V1?layerUrl=https://services2.arcgis.com/CwbO1K4qp8M3IDwA/arcgis/rest/services/Parcels_new/FeatureServer&portalId=0e77a171e98c409a929e435b13269b2e"
+                    toUrl="/CompassAI-G1-V1?layerUrl=https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer&portalId=810c4f24fa0947e58ad8a0986b5fb63d"
                     openNav={openNav}
                     name={t("CompassAI-G1-V1")}
                     icon={<HiMiniTableCells />}

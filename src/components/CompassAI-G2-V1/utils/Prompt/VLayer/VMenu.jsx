@@ -67,7 +67,7 @@ const VMenu = () => {
                     }
                 />
 
-                <MenuItem onClick={handleClose}>
+                {/* <MenuItem onClick={handleClose}>
                     <p className="mr-2">redo</p>
                     <LuRedo2 />
                 </MenuItem>
@@ -78,7 +78,7 @@ const VMenu = () => {
                 <MenuItem onClick={handleClose}>
                     <p className="mr-2">Edits Log</p>
                     <LuLogs />
-                </MenuItem>
+                </MenuItem> */}
             </Menu>
         </>
     );

@@ -19,7 +19,7 @@ const CompassAIV3 = () => {
         // If sandbox: use the restricted view-only key from .env
         // If live: use the token provided in the URL
         const activeToken = isSandbox
-            ? import.meta.env.VITE_ARCGIS_SANDBOX_TOKEN
+            ? JSON.parse(localStorage.getItem("LayerToken"))
             : tokenFromUrl;
 
         if (activeToken) {

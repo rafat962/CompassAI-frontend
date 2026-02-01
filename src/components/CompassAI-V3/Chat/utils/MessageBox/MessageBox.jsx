@@ -69,15 +69,14 @@ const MessageBox = () => {
 
         // --- Sandbox Logic Implementation ---
         const isSandbox = ApiKey === "sandbox";
-
         const payload = {
             message,
             // If sandbox, use hardcoded sample layer, else use dynamic layerUrl from redux
-            featureUrl: isSandbox
-                ? "https://services3.arcgis.com/UDCw00RKDRKPqASe/arcgis/rest/services/Land/FeatureServer"
-                : layerUrl,
+            featureUrl: isSandbox ? import.meta.env.VITE_FEATURE : layerUrl,
             // If sandbox, token might be handled by backend or env, else use URL token
-            token: isSandbox ? "" : token,
+            token: isSandbox
+                ? JSON.parse(localStorage.getItem("LayerToken"))
+                : token,
             history: sendHistoryToBackend,
             ApiKey: ApiKey, // Will be "sandbox" or the actual key
         };

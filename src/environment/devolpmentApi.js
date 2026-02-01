@@ -1,7 +1,7 @@
 // const client_id = "WH0LmusDlyfSa01r";
 // const client_secret = "73c97cfef0464634892fb8e5c27fbeb7";
-const client_id = "yqUBYA6W9Cv3ozNw";
-const client_secret = "482b7c6d20f54962a4c99050320f34c0";
+const client_id = "Y2B2T80HYTyR7asw";
+const client_secret = "d511bd306c204fb99b53571e6ab58dbf";
 
 const BASE_URL =
     "https://services5.arcgis.com/ne9grLzCHxFUfhFy/arcgis/rest/services/";
